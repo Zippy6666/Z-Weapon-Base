@@ -96,14 +96,18 @@ SWEP.Primary.Sound = "^weapons/smg1/npc_smg1_fire1.wav" -- The sound to play whe
 SWEP.Primary.ViewPunch = 2 -- The amount to kick the player's screen when firing
 SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 
-SWEP.Primary.Bullet = {}
-SWEP.Primary.Bullet.Damage = 5
-SWEP.Primary.Bullet.Force = 1
-SWEP.Primary.Bullet.HullSize = 0
-SWEP.Primary.Bullet.Num = 1
-SWEP.Primary.Bullet.Tracer = 0
-SWEP.Primary.Bullet.TracerName = nil
-SWEP.Primary.Bullet.Spread = 0.03
+SWEP.Primary.Bullet = {} -- Don't touch
+SWEP.Primary.Bullet.Damage = 10 -- Bullet damage
+SWEP.Primary.Bullet.Force = 1 -- Bullet force on physics
+SWEP.Primary.Bullet.HullSize = 0 -- Bullet hull size
+SWEP.Primary.Bullet.Num = 1 -- Amount of bullets to fire per bang
+SWEP.Primary.Bullet.Tracer = 0 -- Chance for tracers, 0 = Never
+SWEP.Primary.Bullet.TracerName = nil -- Tracer effect name, nil = default, more here: https://wiki.facepunch.com/gmod/Default_Effects
+
+SWEP.Primary.Bullet.Spread = 0.005 -- Base bullet spread
+SWEP.Primary.Bullet.SpreadAccumulation = 0.01 -- Amount to increase spread each shot
+SWEP.Primary.Bullet.SpreadRecover = 0.01 -- Speed at which spread recovers when not shooting
+SWEP.Primary.Bullet.SpreadRecoverDelay = 0.2 -- Time in seconds until spread starts to recover
 
 --[[
 ======================================================================================================================================================
@@ -111,9 +115,11 @@ SWEP.Primary.Bullet.Spread = 0.03
 ======================================================================================================================================================
 --]]
 
-SWEP.IronSights = {}
-SWEP.IronSights.Pos  = Vector(-5.785582, -6.382087, 1.055570)
-SWEP.IronSights.Speed = 15
+SWEP.IronSights = {} -- Don't touch
+SWEP.IronSights.Pos  = Vector(-5.785582, -6.382087, 1.055570) -- Weapon position offset when in sights
+SWEP.IronSights.Speed = 15 -- Speed at which sights are lowered/risen
+SWEP.IronSights.ZoomAmount = 20 -- Amount to zoom the screen when in sights
+
 
 SWEP.Secondary.Ammo = -1 -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
 SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 

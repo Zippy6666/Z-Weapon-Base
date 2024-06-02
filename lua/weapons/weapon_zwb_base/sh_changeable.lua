@@ -4,7 +4,11 @@ AddCSLuaFile()
 
 
     -- Called after the swep has been created/spawned
-function SWEP:Post_Initialize()
+function SWEP:On_Initialize()
+end
+
+    -- Called when the swep thinks
+function SWEP:On_Think()
 end
 
 
@@ -27,6 +31,7 @@ end
 SWEP.Use_Custom_PrimaryAttack = false
 function SWEP:Custom_PrimaryAttack()
 end
+
 
     -- Your own view punch code
 SWEP.Use_Custom_ViewPunch = false

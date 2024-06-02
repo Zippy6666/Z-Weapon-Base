@@ -18,10 +18,33 @@ SWEP.IsZWBWeapon = true
 --]]
 
 function SWEP:Initialize()
+
+	self:On_Initialize()
+
+	-- Holdtype
 	self:SetHoldType( self.HoldType )
-	self:Post_Initialize()
+
+	-- Vars
+	self.Inter_CurSpreadAdd = 0
+
 end
 
+
+
+function SWEP:Think()
+
+	self:On_Think()
+
+	if SERVER then
+
+		-- Decrease spread accumulation when not firing
+		if !self.Inter_IsFiring && self.Inter_CurSpreadAdd > 0 then
+			self.Inter_CurSpreadAdd = math.Clamp(self.Inter_CurSpreadAdd-self.Primary.Bullet.SpreadRecover, 0, self.Inter_CurSpreadAdd)
+		end
+
+	end
+
+end
 
 --[[
 ======================================================================================================================================================
@@ -44,6 +67,12 @@ function SWEP:PrimaryAttack()
 	if !self:CanPrimaryAttack() then return end
 
 
+	local spread_mult_from_speed = own:IsPlayer() && 1+own:GetVelocity():Length()*0.01 or 1
+	local spread = (self.ZWB_AimingDownSights && self.Primary.Bullet.Spread or self.Primary.Bullet.Spread*5)*spread_mult_from_speed
+	local spread_accumulated = math.Clamp(spread+self.Inter_CurSpreadAdd, 0, 1)
+	local accumulate = self.ZWB_AimingDownSights && self.Primary.Bullet.SpreadAccumulation*0.5 or self.Primary.Bullet.SpreadAccumulation
+
+
 	-- Fire bullets
 	self:FireBullets({
 		Damage = self.Primary.Bullet.Damage,
@@ -52,7 +81,7 @@ function SWEP:PrimaryAttack()
 		Num = self.Primary.Bullet.Num,
 		Tracer = self.Primary.Bullet.Tracer,
 		TracerName = self.Primary.Bullet.TracerName,
-		Spread = Vector(self.Primary.Bullet.Spread, self.Primary.Bullet.Spread),
+		Spread = Vector(spread_accumulated, spread_accumulated),
 		Src = own:GetShootPos(),
 		Dir = own:GetAimVector(),
 	})
@@ -61,15 +90,19 @@ function SWEP:PrimaryAttack()
 	self:EmitSound(self.Primary.Sound, 140, math.random(95, 105), 1, CHAN_WEAPON)
 	self:ShootEffects()
 
-	-- Take ammo / set cooldown
-	self:TakePrimaryAmmo(self.Primary.TakeAmmo)
-	self:SetNextPrimaryFire( CurTime() + self.Primary.Cooldown )
-
 	-- View punch
-	if ( !own:IsNPC() ) then
+	if own:IsPlayer() then
 		self:Inter_ViewPunch()
 	end
 
+	-- Increase spread
+	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + accumulate
+	self:TempVar("Inter_IsFiring", true, self.Primary.Bullet.SpreadRecoverDelay)
+
+
+	-- Take ammo / set cooldown
+	self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+	self:SetNextPrimaryFire( CurTime() + self.Primary.Cooldown )
 end
 
 
@@ -81,13 +114,14 @@ function SWEP:Inter_ViewPunch()
 	end
 
 	local own = self:GetOwner()
+	local amt = self.Primary.ViewPunch+(self.Inter_CurSpreadAdd)
 
-	local ang1 = Angle(-self.Primary.ViewPunch*0.33, 0, 0)
+	local ang1 = Angle(-amt*0.33, 0, 0)
 	own:SetViewPunchAngles(ang1)
 
-	local rand1 = math.Rand(-self.Primary.ViewPunch, self.Primary.ViewPunch)*3
-	local rand2 = math.Rand(-self.Primary.ViewPunch, self.Primary.ViewPunch)*3
-	local rand3 = math.Rand(-self.Primary.ViewPunch, self.Primary.ViewPunch)*3
+	local rand1 = math.Rand(-amt, amt)*3
+	local rand2 = math.Rand(-amt, amt)*3
+	local rand3 = math.Rand(-amt, amt)*3
 	local ang2 = Angle(rand1, rand2, rand3)
 	own:SetViewPunchVelocity(ang2)
 
@@ -157,7 +191,7 @@ local bobADS = 0.1
 function SWEP:Inter_DoADS(pos, ang)
 
 	local ADSActive = (self:GetNWBool("ADS") or self.Inter_CL_ADS_Active)
-	local accelIncr = self.IronSights.Speed*0.0075
+	local accelIncr = self.IronSights.Speed*0.006
 
 	if ADSActive then
 
@@ -289,14 +323,17 @@ end
 
 if CLIENT then
 
-
-
 	function SWEP:GetViewModelPosition(pos, ang)
 
 
 		self:Inter_DoADS(pos, ang)
 		return pos, ang
 
+	end
+
+
+	function SWEP:CalcView( ply, pos, ang, fov, znewar, zfar )
+		return pos, ang, fov-(self.IronSights.ZoomAmount*(self.Inter_ADSAmount or 0))
 	end
 
 end

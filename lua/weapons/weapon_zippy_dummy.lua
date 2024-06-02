@@ -16,5 +16,4 @@ SWEP.Category = "Other" -- The spawn menu category that this weapon resides in.
 SWEP.Spawnable = true -- Whether or not this weapon can be obtained through the spawn menu.
 SWEP.AdminOnly = false -- If spawnable, this variable determines whether only administrators can use the button in the spawn menu.
 
-SWEP.Purpose = "Kill everyone."
-SWEP.Instructions = "Shoot 'em up."
+models/weapons/w_shotgun.mdl
