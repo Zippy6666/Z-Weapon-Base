@@ -11,7 +11,7 @@ function SWEP:ZWB_AimDownSights()
     if self.ZWB_AimingDownSights then return end
 
     if SERVER then
-        PrintMessage(HUD_PRINTTALK, "Entered ADS.")
+        self:SetNWBool("ADS", true)
     end
 
     self.ZWB_AimingDownSights = true
@@ -25,7 +25,7 @@ function SWEP:ZWB_StopAimDownSights()
     if !self.ZWB_AimingDownSights then return end
 
     if SERVER then
-        PrintMessage(HUD_PRINTTALK, "Exited ADS.")
+        self:SetNWBool("ADS", false)
     end
 
     self.ZWB_AimingDownSights = false

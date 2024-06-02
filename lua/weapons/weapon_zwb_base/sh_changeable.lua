@@ -1,6 +1,11 @@
 AddCSLuaFile()
 
-// All custom funcs, should start with "Custom_" or "On_"
+// Custom functions that you can change
+
+
+    -- Called after the swep has been created/spawned
+function SWEP:Post_Initialize()
+end
 
 
     -- Called when the player presses a key

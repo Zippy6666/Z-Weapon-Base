@@ -110,6 +110,9 @@ SWEP.Primary.Bullet.Spread = 0.03
 ======================================================================================================================================================
 --]]
 
+SWEP.IronSights = {}
+SWEP.IronSights.Pos  = Vector(1.145851, -6.416810, 1.055570)
+
 SWEP.Secondary.Ammo = -1 -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
 SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
 SWEP.Secondary.DefaultClip = 0 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn

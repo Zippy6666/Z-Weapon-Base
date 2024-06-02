@@ -1,4 +1,8 @@
 # TODO
 - [x] Basic primary
-- [ ] ADS
+- [x] ADS
+    - [ ] Lerp
+    - [ ] Not while sprinting
+    - [ ] Increase accuracy
+    - [ ] Disable bobbing when walking
 - [ ] Automatic kill icon / slot icon

@@ -1,7 +1,11 @@
 AddCSLuaFile()
 
 // Engine functions here
-// Custom functions should start with "Inter_" to mark them as internal
+// New functions should start with "Inter_" to mark them as internal
+
+
+local CvarDeveloper = GetConVar("developer")
+
 
 
 SWEP.IsZWBWeapon = true
@@ -9,12 +13,13 @@ SWEP.IsZWBWeapon = true
 
 --[[
 ======================================================================================================================================================
-                                           INIT
+                                           INITIALIZE
 ======================================================================================================================================================
 --]]
 
 function SWEP:Initialize()
 	self:SetHoldType( self.HoldType )
+	self:Post_Initialize()
 end
 
 
@@ -114,6 +119,65 @@ function SWEP:Inter_StopADS()
 end
 
 
+local posIncMult = 1
+function SWEP:Inter_ADSAdjust()
+	local ply = LocalPlayer()
+	local own = self:GetOwner()
+
+	if own!=ply then return end
+
+
+	if ply.ZWB_AdjustMode == 1 then
+
+		local ftime = FrameTime()
+		if ply:KeyDown(IN_FORWARD) then
+			self.IronSights.Pos.x = self.IronSights.Pos.x+ftime*posIncMult
+		elseif ply:KeyDown(IN_BACK) then
+			self.IronSights.Pos.x = self.IronSights.Pos.x-ftime*posIncMult
+		elseif ply:KeyDown(IN_MOVELEFT) then
+			self.IronSights.Pos.y = self.IronSights.Pos.y+ftime*posIncMult
+		elseif ply:KeyDown(IN_MOVERIGHT) then
+			self.IronSights.Pos.y = self.IronSights.Pos.y-ftime*posIncMult
+		elseif ply:KeyDown(IN_JUMP) then
+			self.IronSights.Pos.z = self.IronSights.Pos.z+ftime*posIncMult
+		elseif ply:KeyDown(IN_SPEED) then
+			self.IronSights.Pos.z = self.IronSights.Pos.z-ftime*posIncMult
+		end
+
+	-- elseif ply.ZWB_AdjustMode == 2 then
+
+	-- print("attempting to adjust angs")
+
+	end
+end
+
+
+local ADS_ADJUST_POS = 1
+local ADS_ADJUST_ANG = 2
+function SWEP:Inter_ADSVMPos(pos, ang)
+
+
+	if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
+		self:Inter_ADSAdjust()
+	end
+
+	local forward, right, up = ang:Forward(), ang:Right(), ang:Up()
+	local ironPos = self.IronSights.Pos
+
+	
+	-- local ironAng, ironPos = self.IronSights.Ang, self.IronSights.Pos
+	-- ang:RotateAroundAxis(forward, ironAng.x)
+	-- ang:RotateAroundAxis(right, ironAng.y)
+	-- ang:RotateAroundAxis(up, ironAng.z)
+
+
+	pos:Add( forward*ironPos.x )
+	pos:Add( right*ironPos.y )
+	pos:Add( up*ironPos.z )
+
+end
+
+
 function SWEP:CanSecondaryAttack()
 	return self:Inter_CanADS()
 end
@@ -129,7 +193,6 @@ function SWEP:SecondaryAttack()
 	self:ZWB_AimDownSights()
 
 end
-
 
 --[[
 ======================================================================================================================================================
@@ -151,3 +214,25 @@ function SWEP:Inter_KeyRelease(key)
 	end
 end
 
+
+--[[
+======================================================================================================================================================
+                                           View Model Position
+======================================================================================================================================================
+--]]
+
+
+if CLIENT then
+
+
+	function SWEP:GetViewModelPosition(EyePos, EyeAng)
+
+		if self:GetNWBool("ADS") then
+			self:Inter_ADSVMPos(EyePos, EyeAng)
+		end
+		
+		return EyePos, EyeAng
+
+	end
+
+end
