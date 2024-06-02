@@ -164,12 +164,6 @@ function SWEP:Inter_DoADS(pos, ang)
 		-- We are doing ADS
 		-- Start raising
 
-		-- Lower bob/sway scale + hide crosshair
-		if self.BobScale != bobADS then
-			self.BobScale = bobADS -- The scale of the viewmodel bob (viewmodel movement from left to right when walking around)
-			self.SwayScale = bobADS -- The scale of the viewmodel sway (viewmodel position lerp when looking around).
-			self.DrawCrosshair = CvarDeveloper:GetBool()
-		end
 
 		-- Accelerate raising of iron sights
 		self.Inter_ADSAmt_Accel = self.Inter_ADSAmt_Accel == 1 && 1
@@ -182,6 +176,9 @@ function SWEP:Inter_DoADS(pos, ang)
 
 		-- Reset this var (important!)
 		self.Inter_ADSAmt_AccelOut = nil
+
+		-- Don't draw crosshair when doing ADS
+		self.DrawCrosshair = false 
 
 	elseif self.Inter_ADSAmount != 0 then
 
@@ -198,10 +195,19 @@ function SWEP:Inter_DoADS(pos, ang)
 		-- Reset this var (important!)
 		self.Inter_ADSAmt_Accel = nil
 
+		-- Draw crosshair if we should when not doing ADS
+		self.DrawCrosshair = self.DoDrawCrosshair
+
 	end
-	
+
+	self.BobScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseBobScale)
+	self.SwayScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseSwayScale)
+
+
 	-- Adjust vm position accordingly
 	if self.Inter_ADSAmount > 0 then
+
+		-- Tweak ADS pos for devs
 		if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
 			self:Inter_ADSAdjust()
 		end
@@ -219,12 +225,6 @@ function SWEP:Inter_DoADS(pos, ang)
 		pos:Add( forward*ironPos.x )
 		pos:Add( right*ironPos.y )
 		pos:Add( up*ironPos.z )
-	elseif self.BobScale != self.BaseBobScale then
-		-- Set bob/sway scale + crosshair
-		-- Returns to normal once sights are completely lowered
-		self.BobScale = self.BaseBobScale -- The scale of the viewmodel bob (viewmodel movement from left to right when walking around)
-		self.SwayScale = self.BaseSwayScale -- The scale of the viewmodel sway (viewmodel position lerp when looking around).
-		self.DrawCrosshair = self.DoDrawCrosshair
 
 	end
 
