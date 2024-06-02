@@ -56,10 +56,11 @@ SWEP.m_bPlayPickupSound = true -- If set to false, the weapon will not play the 
 
 
 SWEP.ViewModelFlip = false -- Used primarily for Counter Strike: Source view models, this variable is used to flip them back to normal.
-SWEP.ViewModelFOV = 62 -- The field of view percieved whilst wielding this SWEP.
+SWEP.ViewModelFOV = 60 -- The field of view percieved whilst wielding this SWEP.
 SWEP.m_WeaponDeploySpeed = 1 -- The deploy speed multiplier. This does not change the internal deployment speed.
-SWEP.BobScale = 1 -- The scale of the viewmodel bob (viewmodel movement from left to right when walking around)
-SWEP.SwayScale = 1 -- The scale of the viewmodel sway (viewmodel position lerp when looking around).
+
+SWEP.BaseBobScale = 1 -- The scale of the viewmodel bob (viewmodel movement from left to right when walking around)
+SWEP.BaseSwayScale = 1 -- The scale of the viewmodel sway (viewmodel position lerp when looking around).
 
 
 -- Makes the player models hands bonemerged onto the view model
@@ -76,7 +77,7 @@ SWEP.UseHands = true
 
 SWEP.BounceWeaponIcon = true -- Should the weapon icon bounce in weapon selection?
 SWEP.DrawAmmo = true -- Should we draw the default HL2 ammo counter?
-SWEP.DrawCrosshair = true -- Should we draw the default crosshair?
+SWEP.DoDrawCrosshair = true -- Should we draw the default crosshair?
 
 
 --[[
@@ -111,7 +112,8 @@ SWEP.Primary.Bullet.Spread = 0.03
 --]]
 
 SWEP.IronSights = {}
-SWEP.IronSights.Pos  = Vector(1.145851, -6.416810, 1.055570)
+SWEP.IronSights.Pos  = Vector(-5.785582, -6.382087, 1.055570)
+SWEP.IronSights.Speed = 15
 
 SWEP.Secondary.Ammo = -1 -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
 SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 

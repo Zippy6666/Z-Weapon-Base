@@ -1,8 +1,9 @@
 # TODO
 - [x] Basic primary
+    - [ ] Spread accumulation
 - [x] ADS
     - [ ] Lerp
-    - [ ] Not while sprinting
     - [ ] Increase accuracy
-    - [ ] Disable bobbing when walking
+    - [x] Disable bobbing when walking
+    - [ ] Zoom
 - [ ] Automatic kill icon / slot icon

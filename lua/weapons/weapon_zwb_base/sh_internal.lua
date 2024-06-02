@@ -111,7 +111,8 @@ end
 
 
 function SWEP:Inter_CanADS()
-	return true
+	local own = self:GetOwner()
+	return IsValid(own) && own:IsPlayer() -- && !own:IsSprinting()
 end
 
 function SWEP:Inter_StopADS()
@@ -152,28 +153,81 @@ function SWEP:Inter_ADSAdjust()
 end
 
 
-local ADS_ADJUST_POS = 1
-local ADS_ADJUST_ANG = 2
-function SWEP:Inter_ADSVMPos(pos, ang)
+local bobADS = 0.1
+function SWEP:Inter_DoADS(pos, ang)
+
+	local ADSActive = (self:GetNWBool("ADS") or self.Inter_CL_ADS_Active)
+	local accelIncr = self.IronSights.Speed*0.0075
+
+	if ADSActive then
+
+		-- We are doing ADS
+		-- Start raising
+
+		-- Lower bob/sway scale + hide crosshair
+		if self.BobScale != bobADS then
+			self.BobScale = bobADS -- The scale of the viewmodel bob (viewmodel movement from left to right when walking around)
+			self.SwayScale = bobADS -- The scale of the viewmodel sway (viewmodel position lerp when looking around).
+			self.DrawCrosshair = CvarDeveloper:GetBool()
+		end
+
+		-- Accelerate raising of iron sights
+		self.Inter_ADSAmt_Accel = self.Inter_ADSAmt_Accel == 1 && 1
+		or ( (self.Inter_ADSAmt_Accel && math.Clamp( self.Inter_ADSAmt_Accel + accelIncr, accelIncr, self.IronSights.Speed)) or accelIncr )
 
 
-	if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
-		self:Inter_ADSAdjust()
+		-- Raise iron sights
+		self.Inter_ADSAmount = self.Inter_ADSAmount == 1 && 1
+		or ( (self.Inter_ADSAmount && math.Clamp( self.Inter_ADSAmount + (FrameTime()* self.Inter_ADSAmt_Accel ), 0, 1)) or 0 )
+
+		-- Reset this var (important!)
+		self.Inter_ADSAmt_AccelOut = nil
+
+	elseif self.Inter_ADSAmount != 0 then
+
+		-- We are not doing ADS
+		-- Start lowering
+
+		-- Accelerate lowering of iron sights
+		self.Inter_ADSAmt_AccelOut = self.Inter_ADSAmt_AccelOut == 1 && 1
+		or ( (self.Inter_ADSAmt_AccelOut && math.Clamp( self.Inter_ADSAmt_AccelOut + accelIncr, accelIncr, self.IronSights.Speed)) or accelIncr )
+
+		-- Lower iron sights
+		self.Inter_ADSAmount = (self.Inter_ADSAmount && math.Clamp( self.Inter_ADSAmount - (FrameTime()*self.Inter_ADSAmt_AccelOut), 0, 1)) or 0
+
+		-- Reset this var (important!)
+		self.Inter_ADSAmt_Accel = nil
+
+	end
+	
+	-- Adjust vm position accordingly
+	if self.Inter_ADSAmount > 0 then
+		if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
+			self:Inter_ADSAdjust()
+		end
+	
+		local forward, right, up = ang:Forward(), ang:Right(), ang:Up()
+		local ironPos = self.IronSights.Pos*self.Inter_ADSAmount
+	
+	
+		-- local ironAng, ironPos = self.IronSights.Ang, self.IronSights.Pos
+		-- ang:RotateAroundAxis(forward, ironAng.x)
+		-- ang:RotateAroundAxis(right, ironAng.y)
+		-- ang:RotateAroundAxis(up, ironAng.z)
+	
+	
+		pos:Add( forward*ironPos.x )
+		pos:Add( right*ironPos.y )
+		pos:Add( up*ironPos.z )
+	elseif self.BobScale != self.BaseBobScale then
+		-- Set bob/sway scale + crosshair
+		-- Returns to normal once sights are completely lowered
+		self.BobScale = self.BaseBobScale -- The scale of the viewmodel bob (viewmodel movement from left to right when walking around)
+		self.SwayScale = self.BaseSwayScale -- The scale of the viewmodel sway (viewmodel position lerp when looking around).
+		self.DrawCrosshair = self.DoDrawCrosshair
+
 	end
 
-	local forward, right, up = ang:Forward(), ang:Right(), ang:Up()
-	local ironPos = self.IronSights.Pos
-
-	
-	-- local ironAng, ironPos = self.IronSights.Ang, self.IronSights.Pos
-	-- ang:RotateAroundAxis(forward, ironAng.x)
-	-- ang:RotateAroundAxis(right, ironAng.y)
-	-- ang:RotateAroundAxis(up, ironAng.z)
-
-
-	pos:Add( forward*ironPos.x )
-	pos:Add( right*ironPos.y )
-	pos:Add( up*ironPos.z )
 
 end
 
@@ -186,8 +240,10 @@ end
 	-- Secondary attack aims down sights
 function SWEP:SecondaryAttack()
 
-	-- Make sure we can shoot first
-	if ( !self:CanSecondaryAttack() ) then return end
+	if ( !self:CanSecondaryAttack() ) then
+		self:Inter_StopADS()
+		return
+	end
 
 
 	self:ZWB_AimDownSights()
@@ -203,6 +259,14 @@ end
 
 function SWEP:Inter_KeyPress(key)
 	self:On_KeyPress(key)
+
+	if key == IN_ATTACK then
+		self:On_KeyPress()
+	end
+
+	if key == IN_ATTACK2 then
+		self:TempVar("Inter_CL_ADS_Active", true, 0.3)
+	end
 end
 
 
@@ -211,6 +275,7 @@ function SWEP:Inter_KeyRelease(key)
 
 	if key == IN_ATTACK2 then
 		self:Inter_StopADS()
+		self.Inter_CL_ADS_Active = false
 	end
 end
 
@@ -225,13 +290,12 @@ end
 if CLIENT then
 
 
-	function SWEP:GetViewModelPosition(EyePos, EyeAng)
 
-		if self:GetNWBool("ADS") then
-			self:Inter_ADSVMPos(EyePos, EyeAng)
-		end
-		
-		return EyePos, EyeAng
+	function SWEP:GetViewModelPosition(pos, ang)
+
+
+		self:Inter_DoADS(pos, ang)
+		return pos, ang
 
 	end
 
