@@ -24,7 +24,7 @@ end
 
 
 function SWEP:CanSecondaryAttack()
-	self:Inter_CanADS()
+	return self:Inter_CanADS()
 end
 
 
