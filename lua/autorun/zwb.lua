@@ -42,8 +42,8 @@ end
 --]]
 
 
--- Note to Zippy:
--- These are the only variables that should differ between addons
+// Note to Zippy:
+// These are the only variables that should differ between addons
 local rootDirectory = "zwb"
 ZWB = ZWB or {}
 

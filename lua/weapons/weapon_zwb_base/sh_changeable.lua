@@ -2,8 +2,7 @@ AddCSLuaFile()
 
 // All custom funcs, should start with "Custom_"
 
+    -- Called when the player releases a key
+function SWEP:Custom_KeyRelease( key )
 
-
-SWEP.Use_Custom_SecondaryAttack = false
-function SWEP:Custom_SecondaryAttack()
 end

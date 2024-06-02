@@ -4,16 +4,53 @@ AddCSLuaFile()
 // Custom functions should start with "Inter_" to mark them as internal
 
 
+SWEP.IsZWBWeapon = true
 
 
+--[[
+======================================================================================================================================================
+                                           SECONDARY/ADS
+======================================================================================================================================================
+--]]
+
+
+function SWEP:Inter_CanADS()
+	return true
+end
+
+function SWEP:Inter_StopADS()
+	self:ZWB_StopAimDownSights()
+end
+
+
+function SWEP:CanSecondaryAttack()
+	self:Inter_CanADS()
+end
+
+
+	-- Secondary attack aims down sights
 function SWEP:SecondaryAttack()
-
-    -- Use custom if we should
-    if self.Use_Custom_SecondaryAttack == true then
-        return self:Custom_CanSecondaryAttack()
-    end
 
 	-- Make sure we can shoot first
 	if ( !self:CanSecondaryAttack() ) then return end
 
+
+	self:ZWB_AimDownSights()
+
+end
+
+
+--[[
+======================================================================================================================================================
+                                           KEY/INPUT
+======================================================================================================================================================
+--]]
+
+
+function SWEP:Inter_KeyRelease(key)
+	self:Custom_KeyRelease(key)
+
+	if key == IN_ATTACK2 then
+		self:Inter_StopADS()
+	end
 end
