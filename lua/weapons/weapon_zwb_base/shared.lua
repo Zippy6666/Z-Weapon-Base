@@ -22,12 +22,13 @@ SWEP.AdminOnly = false -- If spawnable, this variable determines whether only ad
 SWEP.PrintName = "SMG" -- The name of the SWEP displayed in the spawn menu.
 SWEP.Author = "Zippy" -- The SWEP's author.
 SWEP.Category = "Other" -- The spawn menu category that this weapon resides in.
-SWEP.Purpose = "Use this weapon to kill."
-SWEP.Instructions = "Do so by pressing the trigger."
+SWEP.Purpose = "Kill everyone."
+SWEP.Instructions = "Shoot 'em up."
 
 
 SWEP.WorldModel = Model( "models/weapons/w_smg1.mdl" ) -- Relative path to the SWEP's world model.
 SWEP.ViewModel = Model( "models/weapons/c_smg1.mdl" ) -- Relative path to the SWEP's view model.
+SWEP.HoldType = "smg" -- How to hold the weapon: https://wiki.facepunch.com/gmod/Hold_Types
 
 
 SWEP.AutoSwitchFrom = true -- Whether this weapon can be autoswitched away from when the player runs out of ammo in this weapon or picks up another weapon or ammo
@@ -40,8 +41,8 @@ SWEP.AutoSwitchTo = true -- Whether this weapon can be autoswitched to when the 
 SWEP.Weight = 5 
 
 
-SWEP.Slot = 0 -- Slot in the weapon selection menu, starts with 0
-SWEP.SlotPos = 10 -- Position in the slot, should be in the range 0-128
+SWEP.Slot = 2 -- Slot in the weapon selection menu, starts with 0
+SWEP.SlotPos = 1 -- Position in the slot, should be in the range 0-128
 
 
 SWEP.m_bPlayPickupSound = true -- If set to false, the weapon will not play the weapon pick up sound when picked up.
@@ -88,7 +89,20 @@ SWEP.Primary.Ammo = "SMG1" -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.f
 SWEP.Primary.ClipSize = 45 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
 SWEP.Primary.DefaultClip = 270 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
 SWEP.Primary.Automatic = true -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
+SWEP.Primary.Cooldown = 0.1 -- How long until it can fire again
+SWEP.Primary.TakeAmmo = 0.1 -- Amount of ammo to take each shot
+SWEP.Primary.Sound = "^weapons/smg1/npc_smg1_fire1.wav" -- The sound to play when firing
+SWEP.Primary.ViewPunch = 2 -- The amount to kick the player's screen when firing
+SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 
+SWEP.Primary.Bullet = {}
+SWEP.Primary.Bullet.Damage = 5
+SWEP.Primary.Bullet.Force = 1
+SWEP.Primary.Bullet.HullSize = 0
+SWEP.Primary.Bullet.Num = 1
+SWEP.Primary.Bullet.Tracer = 0
+SWEP.Primary.Bullet.TracerName = nil
+SWEP.Primary.Bullet.Spread = 0.03
 
 --[[
 ======================================================================================================================================================
