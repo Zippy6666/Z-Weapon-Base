@@ -42,6 +42,7 @@ SWEP.Primary.Bullet.Spread = 0.005 -- Base bullet spread
 SWEP.Primary.Bullet.SpreadAccumulation = 0.1 -- Amount to increase spread each shot
 SWEP.Primary.Bullet.SpreadRecover = 0.1 -- Speed at which spread recovers when not shooting
 SWEP.Primary.Bullet.SpreadRecoverDelay = 0.3 -- Time in seconds until spread starts to recover
+SWEP.Primary.Bullet.SpreadMax = 0.5 -- Maximum spread when firing recklessly
 
 SWEP.IronSights = {} -- Don't touch
 SWEP.IronSights.Pos  = Vector(-4.688324, -8.973290, 4.042560) -- Weapon position offset when in sights

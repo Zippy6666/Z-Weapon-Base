@@ -9,6 +9,7 @@ local CvarDeveloper = GetConVar("developer")
 
 
 SWEP.IsZWBWeapon = true
+SWEP.DrawCrosshair = false
 
 
 --[[
@@ -26,10 +27,25 @@ function SWEP:Initialize()
 
 	-- Vars
 	self.Inter_CurSpreadAdd = 0
+	self.Inter_NextDecreaseSpread = CurTime()
+
+	-- Client vars
+	if CLIENT then
+		self.Inter_CLNextIncreaseSpread = CurTime()
+	end
 
 end
 
+function SWEP:SetupDataTables()
+	-- Networked vars
+	self:NetworkVar( "Bool", false, "Inter_Net_IsFiring" )
+end
 
+--[[
+======================================================================================================================================================
+                                           THINK
+======================================================================================================================================================
+--]]
 
 function SWEP:Think()
 
@@ -38,8 +54,9 @@ function SWEP:Think()
 	if SERVER then
 
 		-- Decrease spread accumulation when not firing
-		if !self.Inter_IsFiring && self.Inter_CurSpreadAdd > 0 then
+		if !self.Inter_IsFiring && self.Inter_CurSpreadAdd > 0 && self.Inter_NextDecreaseSpread < CurTime() then
 			self.Inter_CurSpreadAdd = math.Clamp(self.Inter_CurSpreadAdd-self.Primary.Bullet.SpreadRecover, 0, self.Inter_CurSpreadAdd)
+			self.Inter_NextDecreaseSpread = CurTime()+0.1
 		end
 
 	end
@@ -51,6 +68,7 @@ end
                                            PRIMARY
 ======================================================================================================================================================
 --]]
+
 
 function SWEP:PrimaryAttack()
 
@@ -67,13 +85,8 @@ function SWEP:PrimaryAttack()
 	if !self:CanPrimaryAttack() then return end
 
 
-	local spread_mult_from_speed = own:IsPlayer() && 1+own:GetVelocity():Length()*0.01 or 1
-	local spread = (self.ZWB_AimingDownSights && self.Primary.Bullet.Spread or self.Primary.Bullet.Spread*5)*spread_mult_from_speed
-	local spread_accumulated = math.Clamp(spread+self.Inter_CurSpreadAdd, 0, 1)
-	local accumulate = self.ZWB_AimingDownSights && self.Primary.Bullet.SpreadAccumulation*0.5 or self.Primary.Bullet.SpreadAccumulation
-
-
 	-- Fire bullets
+	local spread = self:Inter_GetSpread()
 	self:FireBullets({
 		Damage = self.Primary.Bullet.Damage,
 		Force = self.Primary.Bullet.Force,
@@ -81,7 +94,7 @@ function SWEP:PrimaryAttack()
 		Num = self.Primary.Bullet.Num,
 		Tracer = self.Primary.Bullet.Tracer,
 		TracerName = self.Primary.Bullet.TracerName,
-		Spread = Vector(spread_accumulated, spread_accumulated),
+		Spread = Vector(spread, spread),
 		Src = own:GetShootPos(),
 		Dir = own:GetAimVector(),
 	})
@@ -90,19 +103,36 @@ function SWEP:PrimaryAttack()
 	self:EmitSound(self.Primary.Sound, 140, math.random(95, 105), 1, CHAN_WEAPON)
 	self:ShootEffects()
 
+
 	-- View punch
 	if own:IsPlayer() then
 		self:Inter_ViewPunch()
 	end
 
+
 	-- Increase spread
-	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + accumulate
-	self:TempVar("Inter_IsFiring", true, self.Primary.Bullet.SpreadRecoverDelay)
+	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + self.Primary.Bullet.SpreadAccumulation
+	self:TempVar("Inter_IsFiring", true, 0.2)
+	self:TempNetVar("Inter_Net_IsFiring", true, 0.2)
 
 
 	-- Take ammo / set cooldown
 	self:TakePrimaryAmmo(self.Primary.TakeAmmo)
 	self:SetNextPrimaryFire( CurTime() + self.Primary.Cooldown )
+end
+
+
+function SWEP:Inter_GetSpread()
+
+	local own = self:GetOwner()
+	if !IsValid(own) then return 0 end
+
+	local spread_mult_from_speed = own:IsPlayer() && 1+own:GetVelocity():Length()*0.01 or 1
+	local spread = (self.ZWB_AimingDownSights && self.Primary.Bullet.Spread or self.Primary.Bullet.Spread*5)*spread_mult_from_speed -- The spread
+	local spread_max = self.ZWB_AimingDownSights && self.Primary.Bullet.SpreadMax*0.5 or self.Primary.Bullet.SpreadMax -- Spread max is only half when ADS
+	local spread_accumulated = math.Clamp(spread+self.Inter_CurSpreadAdd, 0, spread_max) -- Spread + accumulation
+	return spread_accumulated
+
 end
 
 
@@ -212,7 +242,7 @@ function SWEP:Inter_DoADS(pos, ang)
 		self.Inter_ADSAmt_AccelOut = nil
 
 		-- Don't draw crosshair when doing ADS
-		self.DrawCrosshair = false 
+		self.Inter_DrawCrosshair = false 
 
 	elseif self.Inter_ADSAmount != 0 then
 
@@ -230,7 +260,7 @@ function SWEP:Inter_DoADS(pos, ang)
 		self.Inter_ADSAmt_Accel = nil
 
 		-- Draw crosshair if we should when not doing ADS
-		self.DrawCrosshair = self.DoDrawCrosshair
+		self.Inter_DrawCrosshair = self.DoDrawCrosshair
 
 	end
 
