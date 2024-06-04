@@ -4,4 +4,4 @@
 - [ ] Proper shotgun spread code
 - [ ] Better bullet/primary table, and iron etc
 - [ ] Dynamic light
-- [ ] Improve spread system + crouch spread reduction + crosshair that shows spread
+- [ ] Crouch spread reduction

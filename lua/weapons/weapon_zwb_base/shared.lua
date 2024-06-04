@@ -107,7 +107,7 @@ SWEP.Primary.Bullet.TracerName = nil -- Tracer effect name, nil = default, more 
 SWEP.Primary.Bullet.Spread = 0.005 -- Base bullet spread
 SWEP.Primary.Bullet.SpreadMax = 0.5 -- Max spread when firing recklessly
 SWEP.Primary.Bullet.SpreadAccumulation = 0.01 -- Amount to increase spread each shot
-SWEP.Primary.Bullet.SpreadRecover = 0.01 -- Speed at which spread recovers when not shooting
+SWEP.Primary.Bullet.SpreadRecover = 0.02 -- Speed at which spread recovers when not shooting
 
 
 --[[
