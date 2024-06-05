@@ -5,3 +5,4 @@
 - [ ] Better bullet/primary table, and iron etc
 - [ ] Dynamic light
 - [x] Crouch spread reduction
+- [ ] Add functions that should exist

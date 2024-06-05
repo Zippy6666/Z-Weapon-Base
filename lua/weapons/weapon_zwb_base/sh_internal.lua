@@ -166,7 +166,7 @@ function SWEP:Inter_GetSpread()
 	if !IsValid(own) then return 0 end
 
 	local spreadMult = self:Inter_GetSpreadMult()
-	local speed = (own:IsPlayer() && own:GetVelocity():Length()*0.005) or (own:IsNPC() && own:GetMoveVelocity():Length()*0.005)
+	local speed = (own:IsPlayer() && own:GetVelocity():Length()*0.0002) or (own:IsNPC() && own:GetMoveVelocity():Length()*0.0002)
 	local currentSpread = (baseSpread + self.Inter_CurSpreadAdd) + speed
 
 	if !self:Inter_InADS() then
@@ -307,14 +307,18 @@ function SWEP:Inter_DoADS(pos, ang)
 	self.SwayScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseSwayScale)
 
 
+
 	-- Draw crosshair if we should when not doing ADS
-	self.Inter_DrawCrosshair = self.DoDrawCrosshair
-	
-	if self.Inter_ADSAmount == 1 then
-
+	if self.Inter_ADSAmount >= 0.3 then
 		self.Inter_DrawCrosshair = false
+	else
+		self.Inter_DrawCrosshair = self.DoDrawCrosshair
+	end
 
-	elseif self.Inter_ADSAmount > 0 then
+
+
+
+	if self.Inter_ADSAmount > 0 then
 
 		-- Adjust vm position accordingly
 
