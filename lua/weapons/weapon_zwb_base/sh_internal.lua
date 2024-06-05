@@ -39,6 +39,7 @@ end
 function SWEP:SetupDataTables()
 	-- Networked vars
 	self:NetworkVar( "Bool", false, "Inter_Net_IsFiring" )
+	self:NetworkVar( "Bool", false, "Inter_IsThinking" )
 end
 
 --[[
@@ -55,9 +56,18 @@ function SWEP:Think()
 
 		-- Decrease spread accumulation when not firing
 		if !self.Inter_IsFiring && self.Inter_CurSpreadAdd > 0 && self.Inter_NextDecreaseSpread < CurTime() then
-			self.Inter_CurSpreadAdd = math.Clamp(self.Inter_CurSpreadAdd-self.Primary.Bullet.SpreadRecover, 0, self.Inter_CurSpreadAdd)
+
+			local curSpread = self:Inter_GetSpread()
+			local curSpreadMult = self:Inter_GetSpreadMult()
+
+
+			self.Inter_CurSpreadAdd = math.Clamp(self.Inter_CurSpreadAdd - self.Primary.Bullet.SpreadRecover, 0, self.Primary.Bullet.SpreadMax*self:Inter_GetSpreadMult())
 			self.Inter_NextDecreaseSpread = CurTime()+0.1
+
 		end
+
+		-- Register wheter or not we are thinking
+		self:TempNetVar("Inter_IsThinking", true, 0.2)
 
 	end
 
@@ -111,7 +121,10 @@ function SWEP:PrimaryAttack()
 
 
 	-- Increase spread
-	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + self.Primary.Bullet.SpreadAccumulation
+	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + self.Primary.Bullet.SpreadAccumulation*self:Inter_GetSpreadMult()
+
+
+
 	self:TempVar("Inter_IsFiring", true, 0.2)
 	self:TempNetVar("Inter_Net_IsFiring", true, 0.2)
 
@@ -122,16 +135,45 @@ function SWEP:PrimaryAttack()
 end
 
 
+function SWEP:Inter_GetSpreadMult()
+
+	local own = self:GetOwner()
+
+	if !IsValid(own) then return 0 end
+
+	if own:IsNPC() then
+		return (5 - own:GetCurrentWeaponProficiency())*0.01
+	elseif own:IsPlayer() then
+		local ADSActive = self:Inter_InADS()
+
+		local mult = 1
+
+		if ADSActive or own:Crouching() then
+			mult = mult*0.5
+		end
+
+		return mult
+	end
+
+end
+
+
+local baseSpread = 0.004
 function SWEP:Inter_GetSpread()
 
 	local own = self:GetOwner()
+
 	if !IsValid(own) then return 0 end
 
-	local spread_mult_from_speed = own:IsPlayer() && 1+own:GetVelocity():Length()*0.01 or 1
-	local spread = (self.ZWB_AimingDownSights && self.Primary.Bullet.Spread or self.Primary.Bullet.Spread*5)*spread_mult_from_speed -- The spread
-	local spread_max = self.ZWB_AimingDownSights && self.Primary.Bullet.SpreadMax*0.5 or self.Primary.Bullet.SpreadMax -- Spread max is only half when ADS
-	local spread_accumulated = math.Clamp(spread+self.Inter_CurSpreadAdd, 0, spread_max) -- Spread + accumulation
-	return spread_accumulated
+	local spreadMult = self:Inter_GetSpreadMult()
+	local speed = (own:IsPlayer() && own:GetVelocity():Length()*0.005) or (own:IsNPC() && own:GetMoveVelocity():Length()*0.005)
+	local currentSpread = (baseSpread + self.Inter_CurSpreadAdd) + speed
+
+	if !self:Inter_InADS() then
+		currentSpread = currentSpread + self.Primary.Bullet.HipFireSpread
+	end
+
+	return math.Clamp(currentSpread*spreadMult, 0, self.Primary.Bullet.SpreadMax*spreadMult)
 
 end
 
@@ -172,6 +214,11 @@ end
                                            SECONDARY/ADS
 ======================================================================================================================================================
 --]]
+
+
+function SWEP:Inter_InADS()
+	return self.ZWB_AimingDownSights or self.Inter_CL_ADS_Active or self:GetNWBool("ADS")
+end
 
 
 function SWEP:Inter_CanADS()
@@ -219,11 +266,9 @@ end
 
 local bobADS = 0.1
 function SWEP:Inter_DoADS(pos, ang)
-
-	local ADSActive = (self:GetNWBool("ADS") or self.Inter_CL_ADS_Active)
 	local accelIncr = self.IronSights.Speed*0.006
 
-	if ADSActive then
+	if self:Inter_InADS() then
 
 		-- We are doing ADS
 		-- Start raising
@@ -241,9 +286,6 @@ function SWEP:Inter_DoADS(pos, ang)
 		-- Reset this var (important!)
 		self.Inter_ADSAmt_AccelOut = nil
 
-		-- Don't draw crosshair when doing ADS
-		self.Inter_DrawCrosshair = false 
-
 	elseif self.Inter_ADSAmount != 0 then
 
 		-- We are not doing ADS
@@ -259,17 +301,22 @@ function SWEP:Inter_DoADS(pos, ang)
 		-- Reset this var (important!)
 		self.Inter_ADSAmt_Accel = nil
 
-		-- Draw crosshair if we should when not doing ADS
-		self.Inter_DrawCrosshair = self.DoDrawCrosshair
-
 	end
 
 	self.BobScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseBobScale)
 	self.SwayScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseSwayScale)
 
 
-	-- Adjust vm position accordingly
-	if self.Inter_ADSAmount > 0 then
+	-- Draw crosshair if we should when not doing ADS
+	self.Inter_DrawCrosshair = self.DoDrawCrosshair
+	
+	if self.Inter_ADSAmount == 1 then
+
+		self.Inter_DrawCrosshair = false
+
+	elseif self.Inter_ADSAmount > 0 then
+
+		-- Adjust vm position accordingly
 
 		-- Tweak ADS pos for devs
 		if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then

@@ -104,10 +104,10 @@ SWEP.Primary.Bullet.Num = 1 -- Amount of bullets to fire per bang
 SWEP.Primary.Bullet.Tracer = 0 -- Chance for tracers, 0 = Never
 SWEP.Primary.Bullet.TracerName = nil -- Tracer effect name, nil = default, more here: https://wiki.facepunch.com/gmod/Default_Effects
 
-SWEP.Primary.Bullet.Spread = 0.005 -- Base bullet spread
-SWEP.Primary.Bullet.SpreadMax = 0.5 -- Max spread when firing recklessly
+SWEP.Primary.Bullet.HipFireSpread = 0.06 -- The base spread when not in sights
+SWEP.Primary.Bullet.SpreadMax = 0.3 -- Max spread when firing recklessly
 SWEP.Primary.Bullet.SpreadAccumulation = 0.01 -- Amount to increase spread each shot
-SWEP.Primary.Bullet.SpreadRecover = 0.02 -- Speed at which spread recovers when not shooting
+SWEP.Primary.Bullet.SpreadRecover = 0.03 -- Speed at which spread recovers when not shooting
 
 
 --[[
