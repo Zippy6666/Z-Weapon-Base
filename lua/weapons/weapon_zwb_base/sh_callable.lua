@@ -1,5 +1,8 @@
 AddCSLuaFile()
 
+
+local isMultiplayer = !game.SinglePlayer()
+
 // These are functions you can call
 // Do not change them
 // Should start with "ZWB_"
@@ -10,8 +13,8 @@ function SWEP:ZWB_AimDownSights()
 
     if self.ZWB_AimingDownSights then return end
 
-    if SERVER then
-        self:SetNWBool("ADS", true)
+    if !isMultiplayer && SERVER then
+        self:SetInter_ADS(true)
     end
 
     self.ZWB_AimingDownSights = true
@@ -24,8 +27,8 @@ function SWEP:ZWB_StopAimDownSights()
 
     if !self.ZWB_AimingDownSights then return end
 
-    if SERVER then
-        self:SetNWBool("ADS", false)
+    if !isMultiplayer && SERVER then
+        self:SetInter_ADS(false)
     end
 
     self.ZWB_AimingDownSights = false

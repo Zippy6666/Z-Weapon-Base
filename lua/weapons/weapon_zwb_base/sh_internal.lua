@@ -1,10 +1,19 @@
 AddCSLuaFile()
 
-// Engine functions here
-// New functions should start with "Inter_" to mark them as internal
+
+if SERVER then
+	util.AddNetworkString("ZWB_FiredWeapon_SendCL")
+end
 
 
 local CvarDeveloper = GetConVar("developer")
+local isSingleplayer = game.SinglePlayer()
+local isMultiplayer = !isSingleplayer
+
+
+
+// Engine functions here
+// New functions should start with "Inter_" to mark them as internal
 
 
 
@@ -28,18 +37,26 @@ function SWEP:Initialize()
 	-- Vars
 	self.Inter_CurSpreadAdd = 0
 	self.Inter_NextDecreaseSpread = CurTime()
+	self.Inter_IsFiring = false
+	self.Inter_IsThinking = false
+	
 
 	-- Client vars
 	if CLIENT then
 		self.Inter_CLNextIncreaseSpread = CurTime()
+		self.Inter_CrosshairRecoil = 0
+		self.Inter_Crosshair_Gap = 0
 	end
 
 end
 
 function SWEP:SetupDataTables()
-	-- Networked vars
-	self:NetworkVar( "Bool", false, "Inter_Net_IsFiring" )
-	self:NetworkVar( "Bool", false, "Inter_IsThinking" )
+	if isSingleplayer then
+		-- Networked vars
+		self:NetworkVar( "Bool", false, "Inter_Net_IsFiring" )
+		self:NetworkVar( "Bool", false, "Inter_IsThinking" )
+		self:NetworkVar( "Bool", false, "Inter_ADS" )
+	end
 end
 
 --[[
@@ -50,6 +67,7 @@ end
 
 function SWEP:Think()
 
+	self:TempVar("Inter_IsThinking", true, 0.2)
 	self:On_Think()
 
 	if SERVER then
@@ -67,7 +85,9 @@ function SWEP:Think()
 		end
 
 		-- Register wheter or not we are thinking
-		self:TempNetVar("Inter_IsThinking", true, 0.2)
+		if isSingleplayer then
+			self:TempNetVar("Inter_IsThinking", true, 0.2)
+		end
 
 	end
 
@@ -116,18 +136,28 @@ function SWEP:PrimaryAttack()
 
 	-- View punch
 	if own:IsPlayer() then
+
 		self:Inter_ViewPunch()
+
+		if isMultiplayer && CLIENT then
+			ZWB_CrosshairRecoil()
+		elseif isSingleplayer && SERVER then
+			net.Start("ZWB_FiredWeapon_SendCL")
+			net.Send(own)
+		end
+
 	end
+
 
 
 	-- Increase spread
 	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + self.Primary.Bullet.SpreadAccumulation*self:Inter_GetSpreadMult()
 
 
-
 	self:TempVar("Inter_IsFiring", true, 0.2)
-	self:TempNetVar("Inter_Net_IsFiring", true, 0.2)
-
+	if isSingleplayer then
+		self:TempNetVar("Inter_Net_IsFiring", true, 0.2)
+	end
 
 	-- Take ammo / set cooldown
 	self:TakePrimaryAmmo(self.Primary.TakeAmmo)
@@ -217,7 +247,7 @@ end
 
 
 function SWEP:Inter_InADS()
-	return self.ZWB_AimingDownSights or self.Inter_CL_ADS_Active or self:GetNWBool("ADS")
+	return self.ZWB_AimingDownSights or self.Inter_CL_ADS_Active or (isSingleplayer && self:GetInter_ADS())
 end
 
 
@@ -226,124 +256,124 @@ function SWEP:Inter_CanADS()
 	return IsValid(own) && own:IsPlayer() -- && !own:IsSprinting()
 end
 
+
 function SWEP:Inter_StopADS()
 	self:ZWB_StopAimDownSights()
 end
 
 
-local posIncMult = 1
-function SWEP:Inter_ADSAdjust()
-	local ply = LocalPlayer()
-	local own = self:GetOwner()
+if CLIENT then
+	local posIncMult = 1
+	local bobADS = 0.1
 
-	if own!=ply then return end
+	function SWEP:Inter_ADSAdjust()
+		local ply = LocalPlayer()
+		local own = self:GetOwner()
+
+		if own!=ply then return end
+
+		if ply.ZWB_AdjustMode == 1 then
+
+			local ftime = FrameTime()
+			if ply:KeyDown(IN_FORWARD) then
+				self.IronSights.Pos.x = self.IronSights.Pos.x+ftime*posIncMult
+			elseif ply:KeyDown(IN_BACK) then
+				self.IronSights.Pos.x = self.IronSights.Pos.x-ftime*posIncMult
+			elseif ply:KeyDown(IN_MOVELEFT) then
+				self.IronSights.Pos.y = self.IronSights.Pos.y+ftime*posIncMult
+			elseif ply:KeyDown(IN_MOVERIGHT) then
+				self.IronSights.Pos.y = self.IronSights.Pos.y-ftime*posIncMult
+			elseif ply:KeyDown(IN_JUMP) then
+				self.IronSights.Pos.z = self.IronSights.Pos.z+ftime*posIncMult
+			elseif ply:KeyDown(IN_SPEED) then
+				self.IronSights.Pos.z = self.IronSights.Pos.z-ftime*posIncMult
+			end
+
+		-- elseif ply.ZWB_AdjustMode == 2 then
+
+		-- print("attempting to adjust angs")
+
+		end
+	end
+	
+	function SWEP:Inter_DoADS(pos, ang)
+		local accelIncr = self.IronSights.Speed*0.006
+
+		if self:Inter_InADS() then
+
+			-- We are doing ADS
+			-- Start raising
 
 
-	if ply.ZWB_AdjustMode == 1 then
+			-- Accelerate raising of iron sights
+			self.Inter_ADSAmt_Accel = self.Inter_ADSAmt_Accel == 1 && 1
+			or ( (self.Inter_ADSAmt_Accel && math.Clamp( self.Inter_ADSAmt_Accel + accelIncr, accelIncr, self.IronSights.Speed)) or accelIncr )
 
-		local ftime = FrameTime()
-		if ply:KeyDown(IN_FORWARD) then
-			self.IronSights.Pos.x = self.IronSights.Pos.x+ftime*posIncMult
-		elseif ply:KeyDown(IN_BACK) then
-			self.IronSights.Pos.x = self.IronSights.Pos.x-ftime*posIncMult
-		elseif ply:KeyDown(IN_MOVELEFT) then
-			self.IronSights.Pos.y = self.IronSights.Pos.y+ftime*posIncMult
-		elseif ply:KeyDown(IN_MOVERIGHT) then
-			self.IronSights.Pos.y = self.IronSights.Pos.y-ftime*posIncMult
-		elseif ply:KeyDown(IN_JUMP) then
-			self.IronSights.Pos.z = self.IronSights.Pos.z+ftime*posIncMult
-		elseif ply:KeyDown(IN_SPEED) then
-			self.IronSights.Pos.z = self.IronSights.Pos.z-ftime*posIncMult
+
+			-- Raise iron sights
+			self.Inter_ADSAmount = self.Inter_ADSAmount == 1 && 1
+			or ( (self.Inter_ADSAmount && math.Clamp( self.Inter_ADSAmount + (FrameTime()* self.Inter_ADSAmt_Accel ), 0, 1)) or 0 )
+
+			-- Reset this var (important!)
+			self.Inter_ADSAmt_AccelOut = nil
+
+		elseif self.Inter_ADSAmount != 0 then
+
+			-- We are not doing ADS
+			-- Start lowering
+
+			-- Accelerate lowering of iron sights
+			self.Inter_ADSAmt_AccelOut = self.Inter_ADSAmt_AccelOut == 1 && 1
+			or ( (self.Inter_ADSAmt_AccelOut && math.Clamp( self.Inter_ADSAmt_AccelOut + accelIncr, accelIncr, self.IronSights.Speed)) or accelIncr )
+
+			-- Lower iron sights
+			self.Inter_ADSAmount = (self.Inter_ADSAmount && math.Clamp( self.Inter_ADSAmount - (FrameTime()*self.Inter_ADSAmt_AccelOut), 0, 1)) or 0
+
+			-- Reset this var (important!)
+			self.Inter_ADSAmt_Accel = nil
+
 		end
 
-	-- elseif ply.ZWB_AdjustMode == 2 then
-
-	-- print("attempting to adjust angs")
-
-	end
-end
-
-
-local bobADS = 0.1
-function SWEP:Inter_DoADS(pos, ang)
-	local accelIncr = self.IronSights.Speed*0.006
-
-	if self:Inter_InADS() then
-
-		-- We are doing ADS
-		-- Start raising
-
-
-		-- Accelerate raising of iron sights
-		self.Inter_ADSAmt_Accel = self.Inter_ADSAmt_Accel == 1 && 1
-		or ( (self.Inter_ADSAmt_Accel && math.Clamp( self.Inter_ADSAmt_Accel + accelIncr, accelIncr, self.IronSights.Speed)) or accelIncr )
-
-
-		-- Raise iron sights
-		self.Inter_ADSAmount = self.Inter_ADSAmount == 1 && 1
-		or ( (self.Inter_ADSAmount && math.Clamp( self.Inter_ADSAmount + (FrameTime()* self.Inter_ADSAmt_Accel ), 0, 1)) or 0 )
-
-		-- Reset this var (important!)
-		self.Inter_ADSAmt_AccelOut = nil
-
-	elseif self.Inter_ADSAmount != 0 then
-
-		-- We are not doing ADS
-		-- Start lowering
-
-		-- Accelerate lowering of iron sights
-		self.Inter_ADSAmt_AccelOut = self.Inter_ADSAmt_AccelOut == 1 && 1
-		or ( (self.Inter_ADSAmt_AccelOut && math.Clamp( self.Inter_ADSAmt_AccelOut + accelIncr, accelIncr, self.IronSights.Speed)) or accelIncr )
-
-		-- Lower iron sights
-		self.Inter_ADSAmount = (self.Inter_ADSAmount && math.Clamp( self.Inter_ADSAmount - (FrameTime()*self.Inter_ADSAmt_AccelOut), 0, 1)) or 0
-
-		-- Reset this var (important!)
-		self.Inter_ADSAmt_Accel = nil
-
-	end
-
-	self.BobScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseBobScale)
-	self.SwayScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseSwayScale)
+		self.BobScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseBobScale)
+		self.SwayScale = math.Clamp(1-self.Inter_ADSAmount, bobADS, self.BaseSwayScale)
 
 
 
-	-- Draw crosshair if we should when not doing ADS
-	if self.Inter_ADSAmount >= 0.3 then
-		self.Inter_DrawCrosshair = false
-	else
-		self.Inter_DrawCrosshair = self.DoDrawCrosshair
-	end
-
-
-
-
-	if self.Inter_ADSAmount > 0 then
-
-		-- Adjust vm position accordingly
-
-		-- Tweak ADS pos for devs
-		if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
-			self:Inter_ADSAdjust()
+		-- Draw crosshair if we should when not doing ADS
+		if self.Inter_ADSAmount >= 0.3 then
+			self.Inter_DrawCrosshair = false
+		else
+			self.Inter_DrawCrosshair = self.DoDrawCrosshair
 		end
-	
-		local forward, right, up = ang:Forward(), ang:Right(), ang:Up()
-		local ironPos = self.IronSights.Pos*self.Inter_ADSAmount
-	
-	
-		-- local ironAng, ironPos = self.IronSights.Ang, self.IronSights.Pos
-		-- ang:RotateAroundAxis(forward, ironAng.x)
-		-- ang:RotateAroundAxis(right, ironAng.y)
-		-- ang:RotateAroundAxis(up, ironAng.z)
-	
-	
-		pos:Add( forward*ironPos.x )
-		pos:Add( right*ironPos.y )
-		pos:Add( up*ironPos.z )
 
+
+
+
+		if self.Inter_ADSAmount > 0 then
+
+			-- Adjust vm position accordingly
+
+			-- Tweak ADS pos for devs
+			if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
+				self:Inter_ADSAdjust()
+			end
+		
+			local forward, right, up = ang:Forward(), ang:Right(), ang:Up()
+			local ironPos = self.IronSights.Pos*self.Inter_ADSAmount
+		
+		
+			-- local ironAng, ironPos = self.IronSights.Ang, self.IronSights.Pos
+			-- ang:RotateAroundAxis(forward, ironAng.x)
+			-- ang:RotateAroundAxis(right, ironAng.y)
+			-- ang:RotateAroundAxis(up, ironAng.z)
+		
+		
+			pos:Add( forward*ironPos.x )
+			pos:Add( right*ironPos.y )
+			pos:Add( up*ironPos.z )
+
+		end
 	end
-
-
 end
 
 

@@ -101,7 +101,7 @@ SWEP.Primary.Bullet.Damage = 10 -- Bullet damage
 SWEP.Primary.Bullet.Force = 1 -- Bullet force on physics
 SWEP.Primary.Bullet.HullSize = 0 -- Bullet hull size
 SWEP.Primary.Bullet.Num = 1 -- Amount of bullets to fire per bang
-SWEP.Primary.Bullet.Tracer = 0 -- Chance for tracers, 0 = Never
+SWEP.Primary.Bullet.Tracer = 1 -- Chance for tracers, 0 = Never
 SWEP.Primary.Bullet.TracerName = nil -- Tracer effect name, nil = default, more here: https://wiki.facepunch.com/gmod/Default_Effects
 
 SWEP.Primary.Bullet.HipFireSpread = 0.06 -- The base spread when not in sights
