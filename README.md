@@ -2,7 +2,10 @@
 A simple weapon base for weapons that will feature a easy way to configure ADS. Very WIP.
 
 ## Current Features
-- None basically, very barebones at the moment.
+- Easy to setup ADS system
+- Dynamic bullet spread with a crosshair
+- Neat recoil/kick effect
+- Very lightweight
 
 ## Developer:
 ### Dummy
