@@ -68,8 +68,6 @@ function ZWB_CrosshairRecoil()
         wep.Inter_CLNextIncreaseSpread = CurTime()+wep.Primary.Cooldown
         wep.Inter_CrosshairRecoil = crosshairRecoilAmt
     end
-
-    print("crosshair recoil")
 end
 
 
