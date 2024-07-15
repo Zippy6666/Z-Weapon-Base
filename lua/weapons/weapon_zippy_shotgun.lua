@@ -72,12 +72,13 @@ function SWEP:On_Shoot()
     -- Pump
     if SERVER then
         self:CONV_TempVar("IsPumping", true, 0.4)
-        self:CONV_TempVar("JustFired", true, 0.8)
         self:CONV_TimerSimple(0.2, function()
             self:SendWeaponAnim(ACT_SHOTGUN_PUMP)
             self:EmitSound("weapons/shotgun/shotgun_cock.wav", 70, math.random(125, 130), 0.75, CHAN_AUTO)
         end)
     end
+
+    self:CONV_TempVar("JustFired", true, 0.8)
 
 end
 
@@ -88,22 +89,19 @@ function SWEP:On_Reload()
 
     if !IsValid(own) then return end
 
-    if own:IsPlayer() && self.NextInsertShell < CurTime() && self:Clip1() < self:GetMaxClip1() && !self.IsPumping && !self.JustFired then
+    if own:IsPlayer() && self.NextInsertShell < CurTime() && self:Clip1() < self:GetMaxClip1() && !self.IsPumping && !self.JustFired && own:GetAmmoCount(self.Primary.Ammo) > 0 then
 
-        if SERVER then
-            self:SendWeaponAnim(ACT_VM_RELOAD)
+        self:SendWeaponAnim(ACT_VM_RELOAD)
 
-            own:SetAmmo(own:GetAmmoCount(self.Primary.Ammo)-1, self.Primary.Ammo)
+        own:SetAmmo(own:GetAmmoCount(self.Primary.Ammo)-1, self.Primary.Ammo)
+        self:SetClip1(self:Clip1()+1)
 
-            self:SetClip1(self:Clip1()+1)
-            self.NextInsertShell = CurTime()+0.4
-
-            self:CONV_TimerCreate("ReloadFinishAnim", 0.45, 1, function()
-                self:SendWeaponAnim(ACT_SHOTGUN_RELOAD_FINISH)
-            end)
-        end
+        self:CONV_TimerCreate("ReloadFinishAnim", 0.45, 1, function()
+            self:SendWeaponAnim(ACT_SHOTGUN_RELOAD_FINISH)
+        end)
 
         self:EmitSound("weapons/shotgun/shotgun_reload2.wav", 70, math.random(90, 110), 0.75, CHAN_AUTO)
+        self.NextInsertShell = CurTime()+0.4
 
     elseif own:IsNPC() then
 

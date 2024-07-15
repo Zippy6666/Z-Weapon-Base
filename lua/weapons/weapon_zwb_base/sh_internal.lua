@@ -151,6 +151,8 @@ function SWEP:PrimaryAttack()
 			Spread = Vector(spread, spread),
 			Src = own:GetShootPos(),
 			Dir = own:GetAimVector(),
+			Attacker = own,
+			Inflictor = self,
 		})
 	
 	end
