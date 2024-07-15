@@ -22,9 +22,11 @@ https://github.com/Zippy6666/Z-Weapon-Base/blob/main/lua/weapons/weapon_zwb_base
 
 ## TODO
 - [x] Proper NPC support
-- [ ] Better bullet/primary table, and iron etc
-- [ ] Dynamic light
+- [x] Better bullet/primary table, and iron etc
+- [x] Dynamic light
 - [ ] Add more developer functions
+- [ ] Adjust sights in toolmenu
+- [ ] Add some weapons
 
 ## IDEAS
 - Automatic kill icon / slot icon

@@ -103,8 +103,6 @@ end
 function SWEP:PrimaryAttack()
 
 	local own = self:GetOwner()
-
-
 	if !IsValid(own) then return end
 	if !self:CanPrimaryAttack() then return end
 
@@ -126,6 +124,20 @@ function SWEP:PrimaryAttack()
 	-- Sounds/effects
 	self:EmitSound(self.Primary.Sound, 140, math.random(95, 105), 1, CHAN_WEAPON)
 	self:ShootEffects()
+
+
+	if SERVER then
+		local col = self.Primary.MuzzleLightColor
+		local muzzleLight = ents.Create("light_dynamic")
+		muzzleLight:SetKeyValue("brightness", "2")
+		muzzleLight:SetKeyValue("distance", "300")
+		muzzleLight:SetPos(own:GetShootPos())
+		muzzleLight:Fire("Color", col)
+		muzzleLight:Spawn()
+		muzzleLight:Activate()
+		muzzleLight:Fire("TurnOn", "", 0)
+		SafeRemoveEntityDelayed(muzzleLight, 0.1)
+	end
 
 
 	-- View punch
