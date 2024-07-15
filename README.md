@@ -5,7 +5,7 @@ A simple weapon base for weapons that will feature a easy way to configure ADS. 
 - Easy to setup ADS system
 - Dynamic bullet spread and crosshair
 - Neat recoil/kick effect
-- A very light-weight code
+- A very light-weight code that works well in both singleplayer and multiplayer
 
 ## Developer:
 ### Dummy
@@ -21,11 +21,9 @@ https://github.com/Zippy6666/Z-Weapon-Base/blob/main/lua/weapons/weapon_zwb_base
 https://github.com/Zippy6666/Z-Weapon-Base/blob/main/lua/weapons/weapon_zwb_base/sh_callable.lua
 
 ## TODO
-- [ ] Proper NPC support
-- [ ] Proper shotgun spread code
+- [x] Proper NPC support
 - [ ] Better bullet/primary table, and iron etc
 - [ ] Dynamic light
-- [x] Crouch spread reduction
 - [ ] Add more developer functions
 
 ## IDEAS

@@ -102,12 +102,6 @@ end
 
 function SWEP:PrimaryAttack()
 
-	-- Use custom if we should
-	if self.Use_Custom_PrimaryAttack == true then
-		return self:Custom_PrimaryAttack()
-	end
-
-
 	local own = self:GetOwner()
 
 
@@ -172,8 +166,11 @@ function SWEP:Inter_GetSpreadMult()
 	if !IsValid(own) then return 0 end
 
 	if own:IsNPC() then
-		return (5 - own:GetCurrentWeaponProficiency())*0.01
+
+		return 0
+
 	elseif own:IsPlayer() then
+
 		local ADSActive = self:Inter_InADS()
 
 		local mult = 1
@@ -183,6 +180,7 @@ function SWEP:Inter_GetSpreadMult()
 		end
 
 		return mult
+
 	end
 
 end
@@ -210,11 +208,6 @@ end
 
 function SWEP:Inter_ViewPunch()
 
-	-- Use custom if we should
-	if self.Use_Custom_ViewPunch == true then
-		return self:Custom_ViewPunch()
-	end
-
 	local own = self:GetOwner()
 	local amt = self.Primary.ViewPunch+(self.Inter_CurSpreadAdd)
 
@@ -238,6 +231,20 @@ function SWEP:Reload()
 	end
 end
 
+
+function SWEP:GetNPCBurstSettings()
+	return self.Primary.ClipSize*0.1, self.Primary.ClipSize*0.2, self.Primary.Cooldown
+end
+
+
+function SWEP:GetNPCRestTimes()
+	return self.Primary.Cooldown, self.Primary.Cooldown*2
+end
+
+
+function SWEP:GetNPCBulletSpread( WeaponProficiency )
+	return (5-WeaponProficiency)*self.Primary.Bullet.SpreadMax*8
+end
 
 --[[
 ======================================================================================================================================================

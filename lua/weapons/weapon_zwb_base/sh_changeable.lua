@@ -25,15 +25,3 @@ end
     -- Called on reload
 function SWEP:On_Reload()
 end
-
-
-    -- Your own primary attack
-SWEP.Use_Custom_PrimaryAttack = false
-function SWEP:Custom_PrimaryAttack()
-end
-
-
-    -- Your own view punch code
-SWEP.Use_Custom_ViewPunch = false
-function SWEP:Custom_ViewPunch()
-end
