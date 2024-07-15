@@ -46,7 +46,6 @@ SWEP.SlotPos = 1 -- Position in the slot, should be in the range 0-128
 
 SWEP.m_bPlayPickupSound = true -- If set to false, the weapon will not play the weapon pick up sound when picked up.
 
-
 --[[
 ======================================================================================================================================================
                                            VIEW MODEL

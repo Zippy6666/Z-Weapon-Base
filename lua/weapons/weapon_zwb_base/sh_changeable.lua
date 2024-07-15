@@ -18,6 +18,9 @@ end
 function SWEP:On_Think()
 end
 
+    -- Set your networked variables here
+function SWEP:On_SetupDataTables()
+end
 
 --[[
 ======================================================================================================================================================
@@ -47,6 +50,12 @@ end
 
     -- Called when the SWEP does a primary attack
 function SWEP:On_Shoot()
+end
+
+
+    -- Called before the swep shoots, return true to prevent
+function SWEP:Before_Shoot()
+    return false
 end
 
 

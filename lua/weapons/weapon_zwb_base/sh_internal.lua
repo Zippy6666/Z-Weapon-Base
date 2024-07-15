@@ -54,15 +54,23 @@ function SWEP:Initialize()
 		self.Inter_Crosshair_Gap = 0
 	end
 
+
+	-- local fileExt = ".png"
+	-- if file.Exists("materials/entities/"..self:GetClass()..fileExt, "GAME") then
+	-- 	self.WepSelectIcon = "materials/entities/"..self:GetClass()..fileExt
+	-- end
+
 end
 
 function SWEP:SetupDataTables()
 	if isSingleplayer then
 		-- Networked vars
-		self:NetworkVar( "Bool", false, "Inter_Net_IsFiring" )
-		self:NetworkVar( "Bool", false, "Inter_IsThinking" )
-		self:NetworkVar( "Bool", false, "Inter_ADS" )
+		self:NetworkVar( "Bool", "Inter_Net_IsFiring" )
+		self:NetworkVar( "Bool", "Inter_IsThinking" )
+		self:NetworkVar( "Bool", "Inter_ADS" )
 	end
+
+	self:On_SetupDataTables()
 end
 
 --[[
@@ -106,11 +114,27 @@ end
 --]]
 
 
+function SWEP:CanPrimaryAttack()
+
+	if ( self.Weapon:Clip1() <= 0 ) then
+	
+		self:EmitSound("weapons/ar2/ar2_empty.wav", 70, math.random(90, 110), 0.9, CHAN_AUTO)
+		self:SetNextPrimaryFire( CurTime() + 1 )
+		return false
+		
+	end
+
+	return true
+
+end
+
+
 function SWEP:PrimaryAttack()
 
 	local own = self:GetOwner()
 	if !IsValid(own) then return end
 	if !self:CanPrimaryAttack() then return end
+	if self:Before_Shoot() then return end
 
 
 	-- Fire bullets
@@ -196,7 +220,12 @@ function SWEP:Inter_GetSpreadMult()
 
 	if own:IsNPC() then
 
-		return 0
+		if self.Primary.Bullet.Num >= 2 then
+			-- Shotgun
+			return 1
+		else
+			return 0
+		end
 
 	elseif own:IsPlayer() then
 
@@ -226,7 +255,7 @@ function SWEP:Inter_GetSpread()
 	local speed = (own:IsPlayer() && own:GetVelocity():Length()*0.0002) or (own:IsNPC() && own:GetMoveVelocity():Length()*0.0002)
 	local currentSpread = (baseSpread + self.Inter_CurSpreadAdd) + speed
 
-	if !self:Inter_InADS() then
+	if !self:Inter_InADS() or self.Primary.Bullet.Num >= 2 then
 		currentSpread = currentSpread + self.Primary.Bullet.HipFireSpread
 	end
 
