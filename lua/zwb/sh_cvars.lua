@@ -29,6 +29,21 @@ if CLIENT then
         if !wep.IsZWBWeapon then return end
 
         chat.AddText(color_green, "ADS Position Offset: "..tostring(wep.IronSights.Pos))
+        chat.AddText(color_green, "ADS Angle Offset: "..tostring(wep.IronSights.Ang))
+
+    end)
+
+    concommand.Add("zwb_ads_reset", function(_, _, args)
+
+        local ply = LocalPlayer()
+        local mode = args[1]
+        local wep = ply:GetActiveWeapon()
+
+        if !IsValid(wep) then return end
+        if !wep.IsZWBWeapon then return end
+
+        wep.IronSights.Pos = vector_origin
+        wep.IronSights.Ang = angle_zero
 
     end)
 end

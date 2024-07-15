@@ -96,6 +96,8 @@ SWEP.Primary.ViewPunch = 2 -- The amount to kick the player's screen when firing
 SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 SWEP.Primary.MuzzleLight = true -- Emit dynamic light when shooting
 SWEP.Primary.MuzzleLightColor = "255 125 25" -- The color of the dynamic light when shooting
+SWEP.Primary.DefaultReload = true -- Use the default weapon reload code
+
 
 SWEP.Primary.Bullet = {
     Enable = true, -- Should it fire bullets? Disable to add your own code instead!
@@ -118,7 +120,8 @@ SWEP.Primary.Bullet = {
 --]]
 
 SWEP.IronSights = {
-    Pos  = Vector(-5.785582, -6.382087, 1.055570), -- Weapon position offset when in sights
+    Pos  = Vector(-5.905377, -6.434172, 1.019111), -- Weapon position offset when in sights
+    Ang = Angle(0, 0, 0), -- Weapon angle offset when in sights
     Speed = 15, -- Speed at which sights are lowered/risen
     ZoomAmount = 20, -- Amount to zoom the screen when in sights
 }

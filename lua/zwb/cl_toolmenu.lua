@@ -48,11 +48,28 @@ hook.Add("PopulateToolMenu", "NPCSpawner", function()
 
             RunConsoleCommand("zwb_ads_adjust_mode", tostring(modeNumber))
         end
-        panel:Help("Switch iron sight adjustment mode (disabled, position, or angle).")
 
+        panel:ControlHelp("Switch iron sight adjustment mode (disabled, position, or angle). Crouch while aiming down the sights of your weapon and use your movement keys to adjust until the sights align with the crosshair.")
+        panel:ControlHelp( "\nFORWARD = 'W' (your forward key)" )
+        panel:ControlHelp( "LEFT = 'A' (your left key)" )
+        panel:ControlHelp( "BACKWARD = 'S' (your backward key)" )
+        panel:ControlHelp( "RIGHT = 'D' (your right key)" )
+        panel:ControlHelp( "UP = 'SPACE' (your jump key)" )
+        panel:ControlHelp( "DOWN = 'SHIFT' (your sprint key)\n" )
+
+        local ironSightResetBtn = panel:Button("Reset")
+        ironSightResetBtn:SetTextColor(red)
+        function ironSightResetBtn:DoClick()
+            if !dev:GetBool() then
+                chat.AddText(red, "'developer' must be set to '1' in console!")
+                return
+            end
+            RunConsoleCommand("zwb_ads_reset")
+        end
+        panel:ControlHelp("Reset iron sight position and angles.")
 
         panel:Button("Print ADS Pos", "zwb_ads_print_pos")
-        panel:Help("Print out the vector and angle of the iron sights in the chat.")
+        panel:ControlHelp("Print out the vector and angle of the iron sights in the chat.")
 
     end)
 

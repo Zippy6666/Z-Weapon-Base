@@ -255,10 +255,19 @@ end
 
 
 function SWEP:Reload()
-	local didReload = self:DefaultReload( ACT_VM_RELOAD )
-	if didReload then
+	if !self.Primary.DefaultReload then
+		
 		self:On_Reload()
-		self:EmitSound(self.Primary.ReloadSound, 80, math.random(95,105), 0.75, CHAN_AUTO)
+
+	else
+
+		local didReload = self:DefaultReload( ACT_VM_RELOAD )
+
+		if didReload then
+			self:On_Reload()
+			self:EmitSound(self.Primary.ReloadSound, 80, math.random(95,105), 0.75, CHAN_AUTO)
+		end
+	
 	end
 end
 
@@ -307,7 +316,8 @@ end
 
 
 if CLIENT then
-	local posIncMult = 1
+	local posIncMult = 0.75
+	local angIncMult = 3
 	local bobADS = 0.1
 
 	function SWEP:Inter_ADSAdjust()
@@ -336,6 +346,20 @@ if CLIENT then
 
 		elseif ply.ZWB_AdjustMode == 2 then
 
+			local ftime = FrameTime()
+			if ply:KeyDown(IN_FORWARD) then
+				self.IronSights.Ang.x = self.IronSights.Ang.x+ftime*angIncMult
+			elseif ply:KeyDown(IN_BACK) then
+				self.IronSights.Ang.x = self.IronSights.Ang.x-ftime*angIncMult
+			elseif ply:KeyDown(IN_MOVELEFT) then
+				self.IronSights.Ang.y = self.IronSights.Ang.y+ftime*angIncMult
+			elseif ply:KeyDown(IN_MOVERIGHT) then
+				self.IronSights.Ang.y = self.IronSights.Ang.y-ftime*angIncMult
+			elseif ply:KeyDown(IN_JUMP) then
+				self.IronSights.Ang.z = self.IronSights.Ang.z+ftime*angIncMult
+			elseif ply:KeyDown(IN_SPEED) then
+				self.IronSights.Ang.z = self.IronSights.Ang.z-ftime*angIncMult
+			end
 
 		end
 	end
@@ -406,10 +430,10 @@ if CLIENT then
 			local ironPos = self.IronSights.Pos*self.Inter_ADSAmount
 		
 		
-			-- local ironAng, ironPos = self.IronSights.Ang, self.IronSights.Pos
-			-- ang:RotateAroundAxis(forward, ironAng.x)
-			-- ang:RotateAroundAxis(right, ironAng.y)
-			-- ang:RotateAroundAxis(up, ironAng.z)
+			local ironAng = self.IronSights.Ang*self.Inter_ADSAmount
+			ang:RotateAroundAxis(forward, ironAng.x)
+			ang:RotateAroundAxis(right, ironAng.y)
+			ang:RotateAroundAxis(up, ironAng.z)
 		
 		
 			pos:Add( forward*ironPos.x )
