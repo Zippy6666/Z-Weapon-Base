@@ -34,3 +34,9 @@ function SWEP:ZWB_StopAimDownSights()
     self.ZWB_AimingDownSights = false
 
 end
+
+
+    -- Return wheter or not we are aiming down sights
+function SWEP:ZWB_IsAimingDownSights()
+    return self:Inter_InADS()
+end

@@ -21,6 +21,12 @@ SWEP.IsZWBWeapon = true
 SWEP.DrawCrosshair = false
 
 
+SWEP.Secondary.Ammo = -1 -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
+SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
+SWEP.Secondary.DefaultClip = 0 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
+SWEP.Secondary.Automatic = false -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
+
+
 --[[
 ======================================================================================================================================================
                                            INITIALIZE
@@ -108,25 +114,32 @@ function SWEP:PrimaryAttack()
 
 
 	-- Fire bullets
-	local spread = self:Inter_GetSpread()
-	self:FireBullets({
-		Damage = self.Primary.Bullet.Damage,
-		Force = self.Primary.Bullet.Force,
-		HullSize = self.Primary.Bullet.HullSize,
-		Num = self.Primary.Bullet.Num,
-		Tracer = self.Primary.Bullet.Tracer,
-		TracerName = self.Primary.Bullet.TracerName,
-		Spread = Vector(spread, spread),
-		Src = own:GetShootPos(),
-		Dir = own:GetAimVector(),
-	})
+	if self.Primary.Bullet.Enable then
+
+		local spread = self:Inter_GetSpread()
+		self:FireBullets({
+			Damage = self.Primary.Bullet.Damage,
+			Force = self.Primary.Bullet.Force,
+			HullSize = self.Primary.Bullet.HullSize,
+			Num = self.Primary.Bullet.Num,
+			Tracer = self.Primary.Bullet.Tracer,
+			TracerName = self.Primary.Bullet.TracerName,
+			Spread = Vector(spread, spread),
+			Src = own:GetShootPos(),
+			Dir = own:GetAimVector(),
+		})
+	
+	end
 
 	-- Sounds/effects
-	self:EmitSound(self.Primary.Sound, 140, math.random(95, 105), 1, CHAN_WEAPON)
-	self:ShootEffects()
+	if self.Primary.Sound && self.Primary.Sound != "" then
+		self:EmitSound(self.Primary.Sound, 140, math.random(95, 105), 1, CHAN_WEAPON)
+		self:ShootEffects()
+	end
 
 
-	if SERVER then
+	-- Muzzle light
+	if SERVER && self.Primary.MuzzleLight then
 		local col = self.Primary.MuzzleLightColor
 		local muzzleLight = ents.Create("light_dynamic")
 		muzzleLight:SetKeyValue("brightness", "2")
@@ -160,6 +173,7 @@ function SWEP:PrimaryAttack()
 	self.Inter_CurSpreadAdd = self.Inter_CurSpreadAdd + self.Primary.Bullet.SpreadAccumulation*self:Inter_GetSpreadMult()
 
 
+	-- Important variables
 	self:TempVar("Inter_IsFiring", true, 0.2)
 	if isSingleplayer then
 		self:TempNetVar("Inter_Net_IsFiring", true, 0.2)
@@ -168,6 +182,9 @@ function SWEP:PrimaryAttack()
 	-- Take ammo / set cooldown
 	self:TakePrimaryAmmo(self.Primary.TakeAmmo)
 	self:SetNextPrimaryFire( CurTime() + self.Primary.Cooldown )
+
+
+	self:On_Shoot()
 end
 
 
@@ -220,8 +237,10 @@ end
 
 function SWEP:Inter_ViewPunch()
 
-	local own = self:GetOwner()
 	local amt = self.Primary.ViewPunch+(self.Inter_CurSpreadAdd)
+	if amt <= 0 then return end
+
+	local own = self:GetOwner()
 
 	local ang1 = Angle(-amt*0.33, 0, 0)
 	own:SetViewPunchAngles(ang1)
@@ -258,6 +277,12 @@ function SWEP:GetNPCBulletSpread( WeaponProficiency )
 	return (5-WeaponProficiency)*self.Primary.Bullet.SpreadMax*8
 end
 
+
+function SWEP:CanBePickedUpByNPCs()
+	return true
+end
+
+
 --[[
 ======================================================================================================================================================
                                            SECONDARY/ADS
@@ -290,6 +315,7 @@ if CLIENT then
 		local own = self:GetOwner()
 
 		if own!=ply then return end
+		if !ply:KeyDown(IN_DUCK) then return end
 
 		if ply.ZWB_AdjustMode == 1 then
 
@@ -308,9 +334,8 @@ if CLIENT then
 				self.IronSights.Pos.z = self.IronSights.Pos.z-ftime*posIncMult
 			end
 
-		-- elseif ply.ZWB_AdjustMode == 2 then
+		elseif ply.ZWB_AdjustMode == 2 then
 
-		-- print("attempting to adjust angs")
 
 		end
 	end
@@ -455,7 +480,7 @@ if CLIENT then
 
 	function SWEP:GetViewModelPosition(pos, ang)
 
-
+		self:Custom_GetViewModelPosition(pos, ang)
 		self:Inter_DoADS(pos, ang)
 		return pos, ang
 
@@ -463,7 +488,37 @@ if CLIENT then
 
 
 	function SWEP:CalcView( ply, pos, ang, fov, znewar, zfar )
+		self:Custom_CalcView( ply, pos, ang, fov, znewar, zfar )
 		return pos, ang, fov-(self.IronSights.ZoomAmount*(self.Inter_ADSAmount or 0))
 	end
 
+end
+
+
+--[[
+======================================================================================================================================================
+                                           Other
+======================================================================================================================================================
+--]]
+
+
+function SWEP:FireAnimationEvent( pos, ang, event, options, source )
+	local returnValue = self:Custom_FireAnimationEvent(pos, ang, event, options, source)
+	if returnValue != nil then
+		return returnValue
+	end
+end
+
+
+function SWEP:Deploy()
+	self:On_Deploy()
+	return true
+end
+
+
+function SWEP:Holster()
+	local returnValue = self:On_Holster()
+	if returnValue != nil then
+		return returnValue
+	end
 end

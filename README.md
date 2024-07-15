@@ -24,8 +24,8 @@ https://github.com/Zippy6666/Z-Weapon-Base/blob/main/lua/weapons/weapon_zwb_base
 - [x] Proper NPC support
 - [x] Better bullet/primary table, and iron etc
 - [x] Dynamic light
-- [ ] Add more developer functions
-- [ ] Adjust sights in toolmenu
+- [x] Add more developer functions
+- [x] Adjust sights in toolmenu
 - [ ] Add some weapons
 
 ## IDEAS

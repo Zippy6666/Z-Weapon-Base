@@ -4,11 +4,10 @@ include("sh_callable.lua")
 include("sh_changeable.lua")
 
 // Here you can see the available variables
-// More here: https://wiki.facepunch.com/gmod/Structures/SWEP#ClassName
 
 --[[
 ======================================================================================================================================================
-                                           VARIABLES: BASICS
+                                           BASICS
 ======================================================================================================================================================
 --]]
 
@@ -50,7 +49,7 @@ SWEP.m_bPlayPickupSound = true -- If set to false, the weapon will not play the 
 
 --[[
 ======================================================================================================================================================
-                                           VARIABLES: VIEW MODEL
+                                           VIEW MODEL
 ======================================================================================================================================================
 --]]
 
@@ -70,7 +69,7 @@ SWEP.UseHands = true
 
 --[[
 ======================================================================================================================================================
-                                           VARIABLES: HUD/CROSSHAIR
+                                        HUD / CROSSHAIR
 ======================================================================================================================================================
 --]]
 
@@ -95,9 +94,11 @@ SWEP.Primary.TakeAmmo = 1 -- Amount of ammo to take each shot
 SWEP.Primary.Sound = "^weapons/smg1/npc_smg1_fire1.wav" -- The sound to play when firing
 SWEP.Primary.ViewPunch = 2 -- The amount to kick the player's screen when firing
 SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
-SWEP.Primary.MuzzleLightColor = "255 125 25"
+SWEP.Primary.MuzzleLight = true -- Emit dynamic light when shooting
+SWEP.Primary.MuzzleLightColor = "255 125 25" -- The color of the dynamic light when shooting
 
 SWEP.Primary.Bullet = {
+    Enable = true, -- Should it fire bullets? Disable to add your own code instead!
     Damage = 10, -- Bullet damage
     Force = 1, -- Bullet force on physics
     HullSize = 0, -- Bullet hull size
@@ -112,7 +113,7 @@ SWEP.Primary.Bullet = {
 
 --[[
 ======================================================================================================================================================
-                                           SECONDARY FIRE (DISABLED BY DEFAULT, SECONDARY IS AIM DOWN SIGHTS INSTEAD)
+                                           IRON SIGHTS / ADS
 ======================================================================================================================================================
 --]]
 
@@ -121,8 +122,3 @@ SWEP.IronSights = {
     Speed = 15, -- Speed at which sights are lowered/risen
     ZoomAmount = 20, -- Amount to zoom the screen when in sights
 }
-
-SWEP.Secondary.Ammo = -1 -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
-SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
-SWEP.Secondary.DefaultClip = 0 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
-SWEP.Secondary.Automatic = false -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
