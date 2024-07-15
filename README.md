@@ -1,2 +1,2 @@
 # Zippy's Weapon Base
-Addon template for my base!
+Addon template for my weapon base!
