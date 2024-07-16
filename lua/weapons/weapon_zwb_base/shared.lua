@@ -12,8 +12,8 @@ include("sh_changeable.lua")
 --]]
 
 
--- The weapon's base script, relative to lua/weapons.
-SWEP.Base = "weapon_base" -- Set to "weapon_zwb_base"
+SWEP.Base = "weapon_base" -- SET TO "weapon_zwb_base"!
+SWEP.IsZWBWeapon = true -- KEEP THIS!
 
 
 SWEP.Spawnable = true -- Whether or not this weapon can be obtained through the spawn menu.
