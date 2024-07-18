@@ -28,6 +28,7 @@ SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 SWEP.Primary.MuzzleLight = true -- Emit dynamic light when shooting
 SWEP.Primary.MuzzleLightColor = "255 125 25" -- The color of the dynamic light when shooting
 SWEP.Primary.DefaultReload = false -- Use the default weapon reload code
+SWEP.Primary.MuzzleFlash = "big" -- Should it have a muzzle flash? Set to false to disable. Set to "big" for a bigger muzzleflash.
 
 
 SWEP.Primary.Bullet = {

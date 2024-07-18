@@ -166,6 +166,7 @@ function SWEP:PrimaryAttack()
 
 	-- Muzzle light
 	if SERVER && self.Primary.MuzzleLight then
+
 		local col = self.Primary.MuzzleLightColor
 		local muzzleLight = ents.Create("light_dynamic")
 		muzzleLight:SetKeyValue("brightness", "2")
@@ -176,7 +177,9 @@ function SWEP:PrimaryAttack()
 		muzzleLight:Activate()
 		muzzleLight:Fire("TurnOn", "", 0)
 		SafeRemoveEntityDelayed(muzzleLight, 0.1)
+
 	end
+
 
 
 	-- View punch
@@ -211,6 +214,43 @@ function SWEP:PrimaryAttack()
 
 
 	self:On_Shoot()
+end
+
+
+function SWEP:Inter_DefaultMuzzleFlash()
+	local vm = self:GetOwner():GetViewModel()
+	if IsValid(vm) then
+
+		if self.Primary.MuzzleFlash == true then
+			local effectdata = EffectData()
+			effectdata:SetEntity(vm)
+			effectdata:SetFlags(1)
+			util.Effect( "MuzzleFlash", effectdata, true, true )
+		elseif self.Primary.MuzzleFlash == "big" then
+			local effectdata = EffectData()
+			effectdata:SetEntity(vm)
+			effectdata:SetFlags(7)
+			util.Effect( "MuzzleFlash", effectdata, true, true )
+		end
+	
+	end
+end
+
+
+function SWEP:Inter_DefaultWorldMuzzleFlash()
+
+	if self.Primary.MuzzleFlash == true then
+		local effectdata = EffectData()
+		effectdata:SetEntity(self)
+		effectdata:SetFlags(1)
+		util.Effect( "MuzzleFlash", effectdata, true, true )
+	elseif self.Primary.MuzzleFlash == "big" then
+		local effectdata = EffectData()
+		effectdata:SetEntity(self)
+		effectdata:SetFlags(7)
+		util.Effect( "MuzzleFlash", effectdata, true, true )
+	end
+
 end
 
 
@@ -273,14 +313,17 @@ function SWEP:Inter_ViewPunch()
 
 	local own = self:GetOwner()
 
+	
 	local ang1 = Angle(-amt*0.33, 0, 0)
 	own:SetViewPunchAngles(ang1)
 
-	local rand1 = math.Rand(-amt, amt)*3
-	local rand2 = math.Rand(-amt, amt)*3
-	local rand3 = math.Rand(-amt, amt)*3
-	local ang2 = Angle(rand1, rand2, rand3)
-	own:SetViewPunchVelocity(ang2)
+	if self:Inter_InADS() then
+		local rand1 = math.Rand(-amt, amt)*3
+		local rand2 = math.Rand(-amt, amt)*3
+		local rand3 = math.Rand(-amt, amt)*3
+		local ang2 = Angle(rand1, rand2, rand3)
+		own:SetViewPunchVelocity(ang2)
+	end
 
 end
 
@@ -558,10 +601,18 @@ end
 
 
 function SWEP:FireAnimationEvent( pos, ang, event, options, source )
+
 	local returnValue = self:Custom_FireAnimationEvent(pos, ang, event, options, source)
 	if returnValue != nil then
 		return returnValue
 	end
+
+	if event == 22 && self.Primary.MuzzleFlash && IsFirstTimePredicted() then
+		self:Inter_DefaultWorldMuzzleFlash()
+	elseif CLIENT && event == 21 && self.Primary.MuzzleFlash then
+		self:Inter_DefaultMuzzleFlash()
+	end
+
 end
 
 
