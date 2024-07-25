@@ -17,7 +17,7 @@ SWEP.HoldType = "shotgun" -- How to hold the weapon: https://wiki.facepunch.com/
 SWEP.ViewModelFOV = 60 -- The field of view percieved whilst wielding this SWEP.
 
 SWEP.Primary.Ammo = "buckshot" -- Ammo type (buckshot, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
-SWEP.Primary.ClipSize = 8 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
+SWEP.Primary.ClipSize = 8 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket
 SWEP.Primary.DefaultClip = 32 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
 SWEP.Primary.Automatic = true -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
 SWEP.Primary.Cooldown = 0.8 -- How long until it can fire again
@@ -26,7 +26,7 @@ SWEP.Primary.Sound = "^weapons/shotgun/shotgun_fire6.wav" -- The sound to play w
 SWEP.Primary.ViewPunch = 8 -- The amount to kick the player's screen when firing
 SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 SWEP.Primary.MuzzleLight = true -- Emit dynamic light when shooting
-SWEP.Primary.MuzzleLightColor = "255 125 25" -- The color of the dynamic light when shooting
+SWEP.Primary.MuzzleLightColor = Color(255, 125, 25) -- The color of the dynamic light when shooting
 SWEP.Primary.DefaultReload = false -- Use the default weapon reload code
 SWEP.Primary.MuzzleFlash = "big" -- Should it have a muzzle flash? Set to false to disable. Set to "big" for a bigger muzzleflash.
 

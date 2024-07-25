@@ -22,7 +22,7 @@ SWEP.DrawCrosshair = false
 
 
 SWEP.Secondary.Ammo = -1 -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
-SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
+SWEP.Secondary.ClipSize = -1 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket
 SWEP.Secondary.DefaultClip = 0 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
 SWEP.Secondary.Automatic = false -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
 
@@ -45,7 +45,7 @@ function SWEP:Initialize()
 	self.Inter_NextDecreaseSpread = CurTime()
 	self.Inter_IsFiring = false
 	self.Inter_IsThinking = false
-	
+
 
 	-- Client vars
 	if CLIENT then
@@ -117,11 +117,11 @@ end
 function SWEP:CanPrimaryAttack()
 
 	if ( self.Weapon:Clip1() <= 0 ) then
-	
+
 		self:EmitSound("weapons/ar2/ar2_empty.wav", 70, math.random(90, 110), 0.9, CHAN_AUTO)
 		self:SetNextPrimaryFire( CurTime() + 1 )
 		return false
-		
+
 	end
 
 	return true
@@ -154,7 +154,7 @@ function SWEP:PrimaryAttack()
 			Attacker = own,
 			Inflictor = self,
 		})
-	
+
 	end
 
 	-- Sounds/effects
@@ -167,7 +167,7 @@ function SWEP:PrimaryAttack()
 	-- Muzzle light
 	if SERVER && self.Primary.MuzzleLight then
 
-		local col = self.Primary.MuzzleLightColor
+		local col = self.Primary.MuzzleLightColor or color_white
 		local muzzleLight = ents.Create("light_dynamic")
 		muzzleLight:SetKeyValue("brightness", "2")
 		muzzleLight:SetKeyValue("distance", "300")
@@ -232,7 +232,7 @@ function SWEP:Inter_DefaultMuzzleFlash()
 			effectdata:SetFlags(7)
 			util.Effect( "MuzzleFlash", effectdata, true, true )
 		end
-	
+
 	end
 end
 
@@ -313,7 +313,7 @@ function SWEP:Inter_ViewPunch()
 
 	local own = self:GetOwner()
 
-	
+
 	local ang1 = Angle(-amt*0.33, 0, 0)
 	own:SetViewPunchAngles(ang1)
 
@@ -330,7 +330,7 @@ end
 
 function SWEP:Reload()
 	if !self.Primary.DefaultReload then
-		
+
 		self:On_Reload()
 
 	else
@@ -341,7 +341,7 @@ function SWEP:Reload()
 			self:On_Reload()
 			self:EmitSound(self.Primary.ReloadSound, 80, math.random(95,105), 0.75, CHAN_AUTO)
 		end
-	
+
 	end
 end
 
@@ -437,7 +437,7 @@ if CLIENT then
 
 		end
 	end
-	
+
 	function SWEP:Inter_DoADS(pos, ang)
 		local accelIncr = self.IronSights.Speed*0.006
 
@@ -499,17 +499,17 @@ if CLIENT then
 			if CvarDeveloper:GetBool() && LocalPlayer().ZWB_AdjustMode then
 				self:Inter_ADSAdjust()
 			end
-		
+
 			local forward, right, up = ang:Forward(), ang:Right(), ang:Up()
 			local ironPos = self.IronSights.Pos*self.Inter_ADSAmount
-		
-		
+
+
 			local ironAng = self.IronSights.Ang*self.Inter_ADSAmount
 			ang:RotateAroundAxis(forward, ironAng.x)
 			ang:RotateAroundAxis(right, ironAng.y)
 			ang:RotateAroundAxis(up, ironAng.z)
-		
-		
+
+
 			pos:Add( forward*ironPos.x )
 			pos:Add( right*ironPos.y )
 			pos:Add( up*ironPos.z )

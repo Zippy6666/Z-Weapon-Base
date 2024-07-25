@@ -37,7 +37,7 @@ SWEP.AutoSwitchTo = true -- Whether this weapon can be autoswitched to when the 
 -- Determines the priority of the weapon when autoswitching.
 -- The weapon being autoswitched from will attempt to switch to a weapon with the same weight that has ammo,
 -- but if none exists, it will prioritise higher weight weapons.
-SWEP.Weight = 5 
+SWEP.Weight = 5
 
 
 SWEP.Slot = 2 -- Slot in the weapon selection menu, starts with 0
@@ -85,7 +85,7 @@ SWEP.DoDrawCrosshair = true -- Should we draw the default crosshair?
 --]]
 
 SWEP.Primary.Ammo = "SMG1" -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
-SWEP.Primary.ClipSize = 45 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
+SWEP.Primary.ClipSize = 45 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket
 SWEP.Primary.DefaultClip = 270 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
 SWEP.Primary.Automatic = true -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
 SWEP.Primary.Cooldown = 0.1 -- How long until it can fire again
@@ -94,7 +94,7 @@ SWEP.Primary.Sound = "^weapons/smg1/npc_smg1_fire1.wav" -- The sound to play whe
 SWEP.Primary.ViewPunch = 2 -- The amount to kick the player's screen when firing
 SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 SWEP.Primary.MuzzleLight = true -- Emit dynamic light when shooting
-SWEP.Primary.MuzzleLightColor = "255 125 25" -- The color of the dynamic light when shooting
+SWEP.Primary.MuzzleLightColor = Color(255, 125, 25) -- The color of the dynamic light when shooting
 SWEP.Primary.DefaultReload = true -- Use the default weapon reload code
 SWEP.Primary.MuzzleFlash = true -- Should it have a muzzle flash? Set to false to disable. Set to "big" for a bigger muzzleflash.
 
