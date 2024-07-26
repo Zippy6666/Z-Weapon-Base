@@ -175,7 +175,7 @@ function SWEP:PrimaryAttack()
 
 		if isstring(col) then
 			muzzleLight:Fire("Color", col)
-		else
+		elseif istable(col) then
 			muzzleLight:Fire("Color", col.r .. " " .. col.g .. " " .. col.b)
 		end
 
