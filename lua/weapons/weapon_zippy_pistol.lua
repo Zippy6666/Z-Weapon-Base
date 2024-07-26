@@ -17,7 +17,7 @@ SWEP.HoldType = "pistol" -- How to hold the weapon: https://wiki.facepunch.com/g
 SWEP.ViewModelFOV = 50 -- The field of view percieved whilst wielding this SWEP.
 
 SWEP.Primary.Ammo = "SMG1" -- Ammo type (Pistol, SMG1, etc.) See: https://wiki.facepunch.com/gmod/Default_Ammo_Types
-SWEP.Primary.ClipSize = 20 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket 
+SWEP.Primary.ClipSize = 20 -- The maximum amount of bullets one clip can hold. Setting it to -1 means weapon uses no clips, like a grenade or a rocket
 SWEP.Primary.DefaultClip = 270 -- Default ammo in the clip, making it higher than ClipSize will give player additional ammo on spawn
 SWEP.Primary.Automatic = false -- If true makes the weapon shoot automatically as long as the player has primary attack button held down
 SWEP.Primary.Cooldown = 0.3 -- How long until it can fire again
@@ -26,7 +26,7 @@ SWEP.Primary.Sound = "^weapons/pistol/pistol_fire3.wav" -- The sound to play whe
 SWEP.Primary.ViewPunch = 4 -- The amount to kick the player's screen when firing
 SWEP.Primary.ReloadSound = "weapons/smg1/smg1_reload.wav"
 SWEP.Primary.MuzzleLight = true -- Emit dynamic light when shooting
-SWEP.Primary.MuzzleLightColor = "255 125 25" -- The color of the dynamic light when shooting
+SWEP.Primary.MuzzleLightColor = Color(255, 125, 25) -- The color of the dynamic light when shooting
 SWEP.Primary.DefaultReload = true -- Use the default weapon reload code
 
 
