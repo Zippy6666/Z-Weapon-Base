@@ -172,7 +172,13 @@ function SWEP:PrimaryAttack()
 		muzzleLight:SetKeyValue("brightness", "2")
 		muzzleLight:SetKeyValue("distance", "300")
 		muzzleLight:SetPos(own:GetShootPos())
-		muzzleLight:Fire("Color", col.r .. " " .. col.g .. " " .. col.b)
+
+		if isstring(col) then
+			muzzleLight:Fire("Color", col)
+		else
+			muzzleLight:Fire("Color", col.r .. " " .. col.g .. " " .. col.b)
+		end
+
 		muzzleLight:Spawn()
 		muzzleLight:Activate()
 		muzzleLight:Fire("TurnOn", "", 0)
