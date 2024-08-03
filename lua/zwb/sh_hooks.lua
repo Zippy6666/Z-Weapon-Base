@@ -40,7 +40,7 @@ hook.Add("PreRegisterSWEP", "ZWB", function( swep, class )
 
         end
 
-		list.Add( "NPCUsableWeapons", { class = class, title = "[ZWB] "..swep.PrintName.." ("..class..")" } ) -- Add to NPC weapons
+		list.Add( "NPCUsableWeapons", { class = class, title = swep.PrintName.." ("..class..")" } ) -- Add to NPC weapons
 	end
 
 end)
