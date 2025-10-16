@@ -120,6 +120,7 @@ SWEP.Primary.Bullet = {
 --]]
 
 SWEP.IronSights = {
+    Enable = true, -- Set to false to disable ironsights and use a secondary attack instead
     Pos  = Vector(-5.905377, -6.434172, 1.019111), -- Weapon position offset when in sights
     Ang = Angle(0, 0, 0), -- Weapon angle offset when in sights
     Speed = 15, -- Speed at which sights are lowered/risen

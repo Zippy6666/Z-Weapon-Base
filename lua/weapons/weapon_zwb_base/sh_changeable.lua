@@ -59,6 +59,13 @@ function SWEP:Before_Shoot()
 end
 
 
+    -- Called before the swep uses its secondary, return true to use this instead of ironsights
+    -- Ensure SWEP.IronSights.Enabled is false if you want to use this function
+function SWEP:Before_Shoot_Secondary()
+    return false
+end
+
+
     -- Called on reload
 function SWEP:On_Reload()
 end

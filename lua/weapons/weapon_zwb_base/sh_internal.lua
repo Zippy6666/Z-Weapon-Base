@@ -533,6 +533,14 @@ end
 	-- Secondary attack aims down sights
 function SWEP:SecondaryAttack()
 
+	if self:Before_Shoot_Secondary() then 
+		return
+	end
+
+	if self.IronSights.Enable == false then
+		return
+	end
+
 	if ( !self:CanSecondaryAttack() ) then
 		self:Inter_StopADS()
 		return
@@ -557,7 +565,7 @@ function SWEP:Inter_KeyPress(key)
 		self:On_KeyPress()
 	end
 
-	if key == IN_ATTACK2 then
+	if key == IN_ATTACK2 && self.IronSights.Enable != false then
 		self:TempVar("Inter_CL_ADS_Active", true, 0.3)
 	end
 end
@@ -566,7 +574,7 @@ end
 function SWEP:Inter_KeyRelease(key)
 	self:On_KeyRelease(key)
 
-	if key == IN_ATTACK2 then
+	if key == IN_ATTACK2 && self.IronSights.Enable != false then
 		self:Inter_StopADS()
 		self.Inter_CL_ADS_Active = false
 	end
